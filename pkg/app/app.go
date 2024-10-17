@@ -60,11 +60,10 @@ func New(appName string, verbose bool, cfg Config, dbo db.DB, dbc *pg.DB) *App {
 // Run is a function that runs application.
 func (a *App) Run() error {
 	a.registerMetrics()
-	a.registerHttpHandlers()
 	a.registerBotHandlers()
-	a.b.Start(context.TODO())
+	go a.b.Start(context.TODO())
 	//return a.runHTTPServer(a.cfg.Server.Host, a.cfg.Server.Port)
-	return nil
+	return a.registerHttpHandlers()
 }
 
 //// VTTypeScriptClient returns TypeScript client for VT.
