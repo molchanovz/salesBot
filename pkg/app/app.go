@@ -1,6 +1,7 @@
 package app
 
 import (
+	"apisrv/pkg/gigaChat"
 	"context"
 	"github.com/go-telegram/bot"
 	"time"
@@ -18,6 +19,7 @@ type Config struct {
 		Token         string
 		SupportChatId string
 	}
+	GigaChat gigaChat.GigaChatConfig
 	Database *pg.Options
 }
 
@@ -31,6 +33,7 @@ type App struct {
 	echo       *echo.Echo
 	vtsrv      zenrpc.Server
 	b          *bot.Bot
+	g          *gigaChat.GigaChat
 }
 
 func New(appName string, verbose bool, cfg Config, dbo db.DB, dbc *pg.DB) *App {
@@ -48,6 +51,7 @@ func New(appName string, verbose bool, cfg Config, dbo db.DB, dbc *pg.DB) *App {
 	a.echo.IPExtractor = echo.ExtractIPFromRealIPHeader()
 	opts := []bot.Option{}
 	a.b, _ = bot.New(cfg.Bot.Token, opts...)
+	a.g = gigaChat.NewGigaChat(cfg.GigaChat)
 	//a.vtsrv = vt.New(a.db, a.Logger, a.cfg.Server.IsDevel)
 
 	return a
@@ -56,6 +60,7 @@ func New(appName string, verbose bool, cfg Config, dbo db.DB, dbc *pg.DB) *App {
 // Run is a function that runs application.
 func (a *App) Run() error {
 	a.registerMetrics()
+	a.registerHttpHandlers()
 	a.registerBotHandlers()
 	a.b.Start(context.TODO())
 	//return a.runHTTPServer(a.cfg.Server.Host, a.cfg.Server.Port)

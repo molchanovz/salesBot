@@ -22,14 +22,26 @@ type Msg struct {
 	Content string `json:"content"`
 }
 
+type GigaChatConfig struct {
+	AuthKey  string
+	ClientId string
+}
+
+type GigaChat struct {
+	AuthKey  string
+	ClientId string
+}
+
+func NewGigaChat(config GigaChatConfig) *GigaChat {
+	return &GigaChat{AuthKey: config.AuthKey, ClientId: config.ClientId}
+}
+
 const (
 	msgUrl   = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
 	tokenUrl = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
-	authKey  = "Mzg3OGYyMTQtMzM3NS00MTY0LWFkMTEtYzAxZmI2NjNkOWY5OmFmNzY1NjU4LWE5ODUtNDIwMC05MjNhLTdjYmUzODAzNmVmNw=="
-	clientId = "3878f214-3375-4164-ad11-c01fb663d9f9"
 )
 
-func SendRequest(content string) (Response, error) {
+func (g GigaChat) SendRequest(content string) (Response, error) {
 	payload := CompletionData{
 		Model: "GigaChat",
 		Messages: []*Msg{
@@ -51,7 +63,7 @@ func SendRequest(content string) (Response, error) {
 
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Authorization", "Bearer "+getToken())
+	req.Header.Add("Authorization", "Bearer "+g.getToken())
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -82,7 +94,7 @@ type Token struct {
 	ExpiresAt   int64  `json:"expires_at"`
 }
 
-func getToken() string {
+func (g GigaChat) getToken() string {
 
 	data := make(map[string]string)
 	data["scope"] = "GIGACHAT_API_PERS"
@@ -101,8 +113,8 @@ func getToken() string {
 
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Authorization", "Basic "+authKey)
-	req.Header.Add("RqUID", clientId)
+	req.Header.Add("Authorization", "Basic "+g.AuthKey)
+	req.Header.Add("RqUID", g.ClientId)
 
 	// Устанавливаем индикатор insecure
 	tr := &http.Transport{

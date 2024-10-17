@@ -1,0 +1,15 @@
+[Bot]
+Token = ""
+SupportChatId = ""
+
+[Database]
+Addr = "localhost:5432"
+User = "postgres"
+Password = ""
+Database = "studup"
+PoolSize = 20
+ApplicationName = "salesBot"
+
+[GigaChat]
+AuthKey  = ""
+ClientId = ""

@@ -1,7 +1,6 @@
 package app
 
 import (
-	"apisrv/pkg/gigaChat"
 	"context"
 	"fmt"
 	"github.com/go-telegram/bot"
@@ -25,7 +24,7 @@ func (a *App) someHandler(ctx context.Context, b *bot.Bot, update *models.Update
 		return
 	}
 
-	str, err := gigaChat.SendRequest(req)
+	str, err := a.g.SendRequest(req)
 	if err != nil {
 		fmt.Println(err)
 	}
