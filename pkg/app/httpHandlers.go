@@ -16,7 +16,7 @@ type WebhookMessage struct {
 	ChatTGId    int    `json:"chattgid"`
 }
 
-func webhookHandler(w http.ResponseWriter, r *http.Request) {
+func (a App) webhookHandler(w http.ResponseWriter, r *http.Request) {
 
 	println("webhook gained ", r.Method)
 	if r.Method != "POST" {
@@ -34,22 +34,24 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Обрабатываем сообщение
-	fmt.Println("Received webhook:")
-	fmt.Printf("\tDescription: %s\n", message.Description)
-	fmt.Printf("\tEvent: %s\n", message.Event)
-	fmt.Printf("\tMessagetype: %s\n", message.MessageType)
-	fmt.Printf("\tMessage: %s\n", message.Message)
-	fmt.Printf("\tUserTGID: %d\n", message.UserTGId)
-	fmt.Printf("\tChatTGID: %d\n", message.ChatTGId)
+	a.Logger.Printf("Received webhook:")
+	a.Logger.Printf("\tDescription: %s\n", message.Description)
+	a.Logger.Printf("\tEvent: %s\n", message.Event)
+	a.Logger.Printf("\tMessagetype: %s\n", message.MessageType)
+	a.Logger.Printf("\tMessage: %s\n", message.Message)
+	a.Logger.Printf("\tUserTGID: %d\n", message.UserTGId)
+	a.Logger.Printf("\tChatTGID: %d\n", message.ChatTGId)
 
 	// Отправляем ответ об успешной обработке вебхука
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write([]byte(`{"status": "ok"}`))
+
+	a.sendWebhookResult(message.Message)
 }
 
 func (a App) registerHttpHandlers() error {
-	http.HandleFunc("/webhook", webhookHandler)
+	http.HandleFunc("/webhook", a.webhookHandler)
 
-	fmt.Println("http run")
+	a.Logger.Printf("http run")
 	return http.ListenAndServe(":8055", nil)
 }

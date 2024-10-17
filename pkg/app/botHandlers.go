@@ -20,17 +20,22 @@ func (a *App) someHandler(ctx context.Context, b *bot.Bot, update *models.Update
 
 	req := update.Message.Text[len(somePattern)+1:]
 	if req == "" {
-		fmt.Println("Запрос пустой")
+		a.Logger.Errorf("Запрос пустой")
 		return
 	}
 
-	str, err := a.g.SendRequest(req)
+	a.processGigachatAnswer(ctx, b, req, chatId)
+}
+
+func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string, chatId int) {
+
+	str, err := a.g.SendRequest(text)
 	if err != nil {
-		fmt.Println(err)
+		a.Logger.Errorf("%v", err)
 	}
 
 	contentString := "Начальный запрос\n\n" +
-		req +
+		text +
 		"\n\nСгенерированный ответ\n\n"
 
 	for _, content := range str.Choices {
@@ -56,9 +61,14 @@ func (a *App) someHandler(ctx context.Context, b *bot.Bot, update *models.Update
 
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatId, Text: contentString, ReplyMarkup: markup})
 	if err != nil {
-		fmt.Println(err)
+		a.Logger.Errorf("%v", err)
 		return
 	}
+}
+
+func (a App) sendWebhookResult(text string) {
+	ctx := context.Background()
+	a.processGigachatAnswer(ctx, a.b, text, a.cfg.Bot.MainUserId)
 }
 
 func pointer[T any](in T) *T {

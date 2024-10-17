@@ -18,6 +18,7 @@ type Config struct {
 	Bot struct {
 		Token         string
 		SupportChatId string
+		MainUserId    int
 	}
 	GigaChat gigaChat.GigaChatConfig
 	Database *pg.Options

@@ -1,6 +1,7 @@
 [Bot]
 Token = ""
 SupportChatId = ""
+MainUserId = 0
 
 [Database]
 Addr = "localhost:5432"
