@@ -68,7 +68,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 		text +
 		"\n\nСгенерированный ответ\n\n"
 
-	var generatedText string
+	generatedText := fmt.Sprint(contentString)
 
 	for _, content := range str.Choices {
 		generatedText = fmt.Sprint(generatedText, content.Message.Content, " ")
