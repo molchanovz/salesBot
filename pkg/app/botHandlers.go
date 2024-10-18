@@ -5,14 +5,18 @@ import (
 	"fmt"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"strconv"
 )
 
 const (
-	somePattern = "/some"
+	somePattern              = "/some"
+	CallBackPatternAgreement = "agree_"
 )
 
 func (a *App) registerBotHandlers() {
 	a.b.RegisterHandler(bot.HandlerTypeMessageText, somePattern, bot.MatchTypePrefix, a.someHandler)
+	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternAgreement, bot.MatchTypePrefix, a.handleStudentInfo)
+
 }
 
 func (a *App) someHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
@@ -27,6 +31,15 @@ func (a *App) someHandler(ctx context.Context, b *bot.Bot, update *models.Update
 	a.processGigachatAnswer(ctx, b, req, chatId)
 }
 
+func (a *App) handleStudentInfo(ctx context.Context, b *bot.Bot, update *models.Update) {
+	userIdStr := update.CallbackQuery.Data[len(CallBackPatternAgreement):]
+	userId, _ := strconv.Atoi(userIdStr)
+	fmt.Printf("Наш юзер %d", userId)
+}
+
+/*
+Функция обращения к API gigaChat
+*/
 func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string, chatId int) {
 
 	str, err := a.g.SendRequest(text)
@@ -48,11 +61,11 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 	var agreementButtons []models.InlineKeyboardButton
 
 	agreementButtons = append(agreementButtons, models.InlineKeyboardButton{
-		Text: "Да", CallbackData: "someData"},
+		Text: "Да", CallbackData: "agree_" + strconv.Itoa(chatId)},
 	)
 
 	agreementButtons = append(agreementButtons, models.InlineKeyboardButton{
-		Text: "Нет", CallbackData: "someData"},
+		Text: "Нет", CallbackData: "refuse"},
 	)
 
 	buttons = append(buttons, agreementButtons)
@@ -66,11 +79,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 	}
 }
 
-func (a App) sendWebhookResult(text string) {
+func (a App) sendWebhookResult(text string, chatId int) {
 	ctx := context.Background()
 	a.processGigachatAnswer(ctx, a.b, text, a.cfg.Bot.MainUserId)
-}
-
-func pointer[T any](in T) *T {
-	return &in
 }
