@@ -3,6 +3,7 @@ package app
 import (
 	sales "apisrv/pkg/client"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
@@ -33,12 +34,16 @@ func (a *App) someHandler(ctx context.Context, b *bot.Bot, update *models.Update
 }
 
 func (a *App) handleInfo(ctx context.Context, b *bot.Bot, update *models.Update) {
-	userIdStr := update.CallbackQuery.Data[len(CallBackPatternAgreement):]
-	userId, _ := strconv.Atoi(userIdStr)
-	fmt.Printf("Наш юзер %d", userId)
+	callBackData := update.CallbackQuery.Data[len(CallBackPatternAgreement):]
+	params, err := NewCallbackDataParams(callBackData)
+	if err != nil {
+		return
+	}
+
+	fmt.Printf("Наш юзер %d", params.TgID)
 
 	c := sales.NewDefaultClient("http://91.222.239.37:8080/v1/rpc/")
-	info, err := c.Sales.SendTextMessageByTgChatID(ctx, userId, "Ответное сообщение")
+	info, err := c.Sales.SendTextMessageByTgChatID(ctx, params.TgID, params.Text)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -63,17 +68,21 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 		text +
 		"\n\nСгенерированный ответ\n\n"
 
+	var generatedText string
+
 	for _, content := range str.Choices {
-		contentString = fmt.Sprint(contentString, content.Message.Content, " ")
+		generatedText = fmt.Sprint(generatedText, content.Message.Content, " ")
 	}
 
-	contentString = fmt.Sprint(contentString, "\n\n", "Отправить ответ?")
+	contentString = fmt.Sprint(generatedText, "\n\n", "Отправить ответ?")
 
 	var buttons [][]models.InlineKeyboardButton
 	var agreementButtons []models.InlineKeyboardButton
 
+	jsonParams := "{  \"text\": \"" + generatedText + "\",\n  \"TgID\": " + strconv.Itoa(chatId) + "\n}"
+
 	agreementButtons = append(agreementButtons, models.InlineKeyboardButton{
-		Text: "Да", CallbackData: "agree_" + strconv.Itoa(chatId)},
+		Text: "Да", CallbackData: "agree_" + jsonParams},
 	)
 
 	agreementButtons = append(agreementButtons, models.InlineKeyboardButton{
@@ -95,4 +104,20 @@ func (a App) sendWebhookResult(message WebhookMessage) {
 
 	ctx := context.Background()
 	a.processGigachatAnswer(ctx, a.b, message.Message, message.ChatTGId)
+}
+
+type CallbackDataParams struct {
+	Text string `json:"text"`
+	TgID int    `json:"TgID"`
+}
+
+func NewCallbackDataParams(s string) (CallbackDataParams, error) {
+	var b CallbackDataParams
+	err := json.Unmarshal([]byte(s), &b)
+	return b, err
+}
+
+func (b CallbackDataParams) String() (string, error) {
+	s, err := json.Marshal(b)
+	return string(s), err
 }
