@@ -1,5 +1,4 @@
 // Code generated from jsonrpc schema by rpcgen v2.4.4; DO NOT EDIT.
-
 package sales
 
 import (

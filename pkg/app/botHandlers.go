@@ -1,6 +1,7 @@
 package app
 
 import (
+	sales "apisrv/pkg/client"
 	"context"
 	"fmt"
 	"github.com/go-telegram/bot"
@@ -15,7 +16,7 @@ const (
 
 func (a *App) registerBotHandlers() {
 	a.b.RegisterHandler(bot.HandlerTypeMessageText, somePattern, bot.MatchTypePrefix, a.someHandler)
-	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternAgreement, bot.MatchTypePrefix, a.handleStudentInfo)
+	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternAgreement, bot.MatchTypePrefix, a.handleInfo)
 
 }
 
@@ -31,10 +32,17 @@ func (a *App) someHandler(ctx context.Context, b *bot.Bot, update *models.Update
 	a.processGigachatAnswer(ctx, b, req, chatId)
 }
 
-func (a *App) handleStudentInfo(ctx context.Context, b *bot.Bot, update *models.Update) {
+func (a *App) handleInfo(ctx context.Context, b *bot.Bot, update *models.Update) {
 	userIdStr := update.CallbackQuery.Data[len(CallBackPatternAgreement):]
 	userId, _ := strconv.Atoi(userIdStr)
 	fmt.Printf("Наш юзер %d", userId)
+	c := sales.NewDefaultClient("http://91.222.239.37:8080/v1/rpc")
+	info, err := c.Sales.GetMyInfo(ctx)
+	if err != nil {
+		return
+	}
+
+	fmt.Printf("Инфо: %+v", info)
 }
 
 /*
