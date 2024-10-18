@@ -51,18 +51,20 @@ func (a *App) handleInfo(ctx context.Context, b *bot.Bot, update *models.Update)
 */
 func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string, chatId int) {
 
-	str, err := a.g.SendRequest(text)
-	if err != nil {
-		a.Logger.Errorf("%v", err)
-	}
+	fmt.Println(chatId)
 
+	//str, err := a.g.SendRequest(text)
+	//if err != nil {
+	//	a.Logger.Errorf("%v", err)
+	//}
+	//
 	contentString := "Начальный запрос\n\n" +
 		text +
 		"\n\nСгенерированный ответ\n\n"
-
-	for _, content := range str.Choices {
-		contentString = fmt.Sprint(contentString, content.Message.Content, " ")
-	}
+	//
+	//for _, content := range str.Choices {
+	//	contentString = fmt.Sprint(contentString, content.Message.Content, " ")
+	//}
 
 	contentString = fmt.Sprint(contentString, "\n\n", "Отправить ответ?")
 
@@ -81,7 +83,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 
 	markup := models.InlineKeyboardMarkup{InlineKeyboard: buttons}
 
-	_, err = b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatId, Text: contentString, ReplyMarkup: markup})
+	_, err := b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatId, Text: contentString, ReplyMarkup: markup})
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
@@ -89,7 +91,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 }
 
 func (a App) sendWebhookResult(text string, chatId int) {
-	fmt.Println("Цикл")
-	//ctx := context.Background()
-	//a.processGigachatAnswer(ctx, a.b, text, a.cfg.Bot.MainUserId)
+
+	ctx := context.Background()
+	a.processGigachatAnswer(ctx, a.b, text, a.cfg.Bot.MainUserId)
 }
