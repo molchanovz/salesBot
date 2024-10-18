@@ -89,6 +89,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 }
 
 func (a App) sendWebhookResult(text string, chatId int) {
-	ctx := context.Background()
-	a.processGigachatAnswer(ctx, a.b, text, a.cfg.Bot.MainUserId)
+	fmt.Println("Цикл")
+	//ctx := context.Background()
+	//a.processGigachatAnswer(ctx, a.b, text, a.cfg.Bot.MainUserId)
 }
