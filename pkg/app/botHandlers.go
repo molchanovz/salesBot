@@ -81,6 +81,8 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 
 	jsonParams := "{  \"text\": \"" + generatedText + "\",\n  \"TgID\": " + strconv.Itoa(chatId) + "\n}"
 
+	fmt.Println(jsonParams)
+
 	agreementButtons = append(agreementButtons, models.InlineKeyboardButton{
 		Text: "Да", CallbackData: "agree_" + jsonParams},
 	)
