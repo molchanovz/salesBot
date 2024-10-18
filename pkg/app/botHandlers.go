@@ -1,7 +1,6 @@
 package app
 
 import (
-	sales "apisrv/pkg/client"
 	"context"
 	"fmt"
 	"github.com/go-telegram/bot"
@@ -36,14 +35,15 @@ func (a *App) handleInfo(ctx context.Context, b *bot.Bot, update *models.Update)
 	userIdStr := update.CallbackQuery.Data[len(CallBackPatternAgreement):]
 	userId, _ := strconv.Atoi(userIdStr)
 	fmt.Printf("Наш юзер %d", userId)
-	c := sales.NewDefaultClient("http://91.222.239.37:8080/v1/rpc/")
-	info, err := c.Sales.SendTextMessageByTgChatID(ctx, userId, "Ответное сообщение")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
 
-	fmt.Printf("Инфо: %+v", info)
+	//c := sales.NewDefaultClient("http://91.222.239.37:8080/v1/rpc/")
+	//info, err := c.Sales.SendTextMessageByTgChatID(ctx, userId, "Ответное сообщение")
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return
+	//}
+	//
+	//fmt.Printf("Инфо: %+v", info)
 }
 
 /*
