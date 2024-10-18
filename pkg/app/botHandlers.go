@@ -81,14 +81,15 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 
 	markup := models.InlineKeyboardMarkup{InlineKeyboard: buttons}
 
-	_, err = b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatId, Text: contentString, ReplyMarkup: markup})
+	//Шлем всегда MainUserId
+	_, err = b.SendMessage(ctx, &bot.SendMessageParams{ChatID: a.cfg.Bot.MainUserId, Text: contentString, ReplyMarkup: markup})
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
 	}
 }
 
-func (a App) sendWebhookResult(text string, chatId int) {
+func (a App) sendWebhookResult(message WebhookMessage) {
 	ctx := context.Background()
-	a.processGigachatAnswer(ctx, a.b, text, a.cfg.Bot.MainUserId)
+	a.processGigachatAnswer(ctx, a.b, message.Message, message.ChatTGId)
 }
