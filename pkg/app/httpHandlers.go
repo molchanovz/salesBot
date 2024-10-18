@@ -33,20 +33,25 @@ func (a App) webhookHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Обрабатываем сообщение
-	a.Logger.Printf("Received webhook:")
-	a.Logger.Printf("\tDescription: %s\n", message.Description)
-	a.Logger.Printf("\tEvent: %s\n", message.Event)
-	a.Logger.Printf("\tMessagetype: %s\n", message.MessageType)
-	a.Logger.Printf("\tMessage: %s\n", message.Message)
-	a.Logger.Printf("\tUserTGID: %d\n", message.UserTGId)
-	a.Logger.Printf("\tChatTGID: %d\n", message.ChatTGId)
+	if message.Event == "new_msg" {
+		// Обрабатываем сообщение
+		a.Logger.Printf("Received webhook:")
+		a.Logger.Printf("\tDescription: %s\n", message.Description)
+		a.Logger.Printf("\tEvent: %s\n", message.Event)
+		a.Logger.Printf("\tMessagetype: %s\n", message.MessageType)
+		a.Logger.Printf("\tMessage: %s\n", message.Message)
+		a.Logger.Printf("\tUserTGID: %d\n", message.UserTGId)
+		a.Logger.Printf("\tChatTGID: %d\n", message.ChatTGId)
 
-	// Отправляем ответ об успешной обработке вебхука
-	w.WriteHeader(http.StatusOK)
-	_, _ = w.Write([]byte(`{"status": "ok"}`))
+		// Отправляем ответ об успешной обработке вебхука
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"status": "ok"}`))
 
-	a.sendWebhookResult(message.Message)
+		a.sendWebhookResult(message.Message)
+	} else {
+		a.Logger.Printf("Ивент вебхука: %s", message.Event)
+	}
+
 }
 
 func (a App) registerHttpHandlers() error {
