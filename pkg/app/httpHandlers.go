@@ -47,7 +47,7 @@ func (a App) webhookHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`{"status": "ok"}`))
 
-		a.sendWebhookResult(message.Message, message.ChatTGId)
+		a.sendWebhookResult(message)
 	} else {
 		a.Logger.Printf("Ивент вебхука: %s", message.Event)
 	}
