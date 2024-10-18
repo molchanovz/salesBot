@@ -39,6 +39,7 @@ func (a *App) handleInfo(ctx context.Context, b *bot.Bot, update *models.Update)
 	c := sales.NewDefaultClient("http://91.222.239.37:8080/v1/rpc")
 	info, err := c.Sales.GetMyInfo(ctx)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
