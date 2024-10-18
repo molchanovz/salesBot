@@ -37,12 +37,13 @@ func (a *App) handleInfo(ctx context.Context, b *bot.Bot, update *models.Update)
 	userId, _ := strconv.Atoi(userIdStr)
 	fmt.Printf("Наш юзер %d", userId)
 	c := sales.NewDefaultClient("http://91.222.239.37:8080/v1/rpc/")
-
-	_, err := c.Sales.SendTextMessageByTgChatID(ctx, userId, "Ответное сообщение")
+	info, err := c.Sales.SendTextMessageByTgChatID(ctx, userId, "Ответное сообщение")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+
+	fmt.Printf("Инфо: %+v", info)
 }
 
 /*
@@ -80,15 +81,14 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 
 	markup := models.InlineKeyboardMarkup{InlineKeyboard: buttons}
 
-	//Шлем всегда MainUserId
-	_, err = b.SendMessage(ctx, &bot.SendMessageParams{ChatID: a.cfg.Bot.MainUserId, Text: contentString, ReplyMarkup: markup})
+	_, err = b.SendMessage(ctx, &bot.SendMessageParams{ChatID: chatId, Text: contentString, ReplyMarkup: markup})
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
 	}
 }
 
-func (a App) sendWebhookResult(message WebhookMessage) {
+func (a App) sendWebhookResult(text string, chatId int) {
 	ctx := context.Background()
-	a.processGigachatAnswer(ctx, a.b, message.Message, message.ChatTGId)
+	a.processGigachatAnswer(ctx, a.b, text, a.cfg.Bot.MainUserId)
 }
