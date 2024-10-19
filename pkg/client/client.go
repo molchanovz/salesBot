@@ -28,7 +28,7 @@ type Client struct {
 
 func NewDefaultClient(endpoint string) *Client {
 	header := http.Header{}
-	header.Set("Authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJib3RVc2VySUQiOjYsInBob25lIjoiODk5NTc5OTM5NzkiLCJleHAiOjE3MzE4NDM2NTF9.bt6_8aOOd-uV4tqjYUCv7dWjCjI_8TDFZOIw7gSIPDs")
+	header.Set("Authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJib3RVc2VySUQiOjIsInBob25lIjoiODk5NTc5OTM5NzkiLCJleHAiOjE3NTM3MTE4MzV9.BrGECaYkpYqSOIEgH3MOtmjgiWZ-jb5Jk71p_iWhMTw")
 	return NewClient(endpoint, header, &http.Client{})
 }
 
