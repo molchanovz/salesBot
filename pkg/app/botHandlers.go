@@ -8,6 +8,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -64,9 +65,9 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 		a.Logger.Errorf("%v", err)
 	}
 
-	contentString := "Начальный запрос\n\n" +
+	contentString := "Начальный запрос\n\n```" +
 		text +
-		"\n\nСгенерированный ответ\n\n"
+		"```\n\nСгенерированный ответ\n\n"
 
 	generatedText := fmt.Sprint(contentString)
 
@@ -74,7 +75,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 		generatedText = fmt.Sprint(generatedText, content.Message.Content, " ")
 	}
 
-	contentString = fmt.Sprint(generatedText, "\n\n", "Отправить ответ?")
+	contentString = fmt.Sprint("```", generatedText, "```", "\n\n", "Отправить ответ?")
 
 	var buttons [][]models.InlineKeyboardButton
 	var agreementButtons []models.InlineKeyboardButton
@@ -105,7 +106,9 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 func (a App) sendWebhookResult(message WebhookMessage) {
 
 	ctx := context.Background()
-	a.processGigachatAnswer(ctx, a.b, message.Message, message.ChatTGId)
+	if strings.Contains(strings.ToLower(message.Message), "двер") {
+		a.processGigachatAnswer(ctx, a.b, message.Message, message.ChatTGId)
+	}
 }
 
 type CallbackDataParams struct {
