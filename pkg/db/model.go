@@ -25,13 +25,13 @@ var Tables = struct {
 	GigachatMessage: struct {
 		Name, Alias string
 	}{
-		Name:  "salesbot.gigachatmessages",
+		Name:  "studup.gigachatmessages",
 		Alias: "t",
 	},
 }
 
 type GigachatMessage struct {
-	tableName struct{} `pg:"salesbot.gigachatmessages,alias:t,discard_unknown_columns"`
+	tableName struct{} `pg:"studup.gigachatmessages,alias:t,discard_unknown_columns"`
 
 	ID      int    `pg:"messageid,pk"`
 	Message string `pg:"message,use_zero"`
