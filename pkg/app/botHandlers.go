@@ -48,10 +48,12 @@ func (a *App) handleInfo(ctx context.Context, b *bot.Bot, update *models.Update)
 
 	message, err := a.sr.GigachatMessageByID(ctx, params.MessageId)
 	if err != nil {
+		a.Logger.Errorf("%v", err)
 		return
 	}
 
 	if message == nil {
+		println("empty")
 		return
 	}
 
@@ -93,10 +95,12 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 
 	message, err := a.sr.AddGigachatMessage(ctx, &db.GigachatMessage{Message: text})
 	if err != nil {
+		a.Logger.Errorf("%v", err)
 		return
 	}
 
 	if message == nil {
+		println("empty msg")
 		return
 	}
 
