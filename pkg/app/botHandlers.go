@@ -2,6 +2,7 @@ package app
 
 import (
 	sales "apisrv/pkg/client"
+	"apisrv/pkg/db"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -44,7 +45,17 @@ func (a *App) handleInfo(ctx context.Context, b *bot.Bot, update *models.Update)
 	fmt.Printf("Наш юзер %d", params.TgID)
 
 	c := sales.NewDefaultClient("http://91.222.239.37:8080/v1/rpc/")
-	info, err := c.Sales.SendTextMessageByTgChatID(ctx, params.TgID, params.Text)
+
+	message, err := a.sr.GigachatMessageByID(ctx, params.MessageId)
+	if err != nil {
+		return
+	}
+
+	if message == nil {
+		return
+	}
+
+	info, err := c.Sales.SendTextMessageByTgChatID(ctx, params.TgID, message.Message)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -80,7 +91,16 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 	var buttons [][]models.InlineKeyboardButton
 	var agreementButtons []models.InlineKeyboardButton
 
-	jsonParams := "{  \"text\": \"" + generatedText + "\",\n  \"TgID\": " + strconv.Itoa(chatId) + "\n}"
+	message, err := a.sr.AddGigachatMessage(ctx, &db.GigachatMessage{Message: text})
+	if err != nil {
+		return
+	}
+
+	if message == nil {
+		return
+	}
+
+	jsonParams := "{  \"messageId\": \"" + strconv.Itoa(message.ID) + "\",\n  \"TgID\": " + strconv.Itoa(chatId) + "\n}"
 
 	fmt.Println(jsonParams)
 
@@ -112,8 +132,8 @@ func (a App) sendWebhookResult(message WebhookMessage) {
 }
 
 type CallbackDataParams struct {
-	Text string `json:"text"`
-	TgID int    `json:"TgID"`
+	MessageId int `json:"messageId"`
+	TgID      int `json:"TgID"`
 }
 
 func NewCallbackDataParams(s string) (CallbackDataParams, error) {
