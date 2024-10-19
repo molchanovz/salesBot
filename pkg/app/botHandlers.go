@@ -39,10 +39,11 @@ func (a *App) handleInfo(ctx context.Context, b *bot.Bot, update *models.Update)
 	callBackData := update.CallbackQuery.Data[len(CallBackPatternAgreement):]
 	params, err := NewCallbackDataParams(callBackData)
 	if err != nil {
+		a.Logger.Errorf("%v", err)
 		return
 	}
 
-	fmt.Printf("Наш юзер %d", params.TgID)
+	a.Logger.Printf("Наш юзер %d", params.TgID)
 
 	c := sales.NewDefaultClient("http://91.222.239.37:8080/v1/rpc/")
 
@@ -53,13 +54,13 @@ func (a *App) handleInfo(ctx context.Context, b *bot.Bot, update *models.Update)
 	}
 
 	if message == nil {
-		println("empty")
+		a.Logger.Errorf("empty")
 		return
 	}
 
 	info, err := c.Sales.SendTextMessageByTgChatID(ctx, params.TgID, message.Message)
 	if err != nil {
-		fmt.Println(err)
+		a.Logger.Errorf("%v", err)
 		return
 	}
 
