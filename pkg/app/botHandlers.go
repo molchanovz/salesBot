@@ -79,17 +79,18 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 		a.Logger.Errorf("%v", err)
 	}
 
-	contentString := "Начальный запрос\n\n```" +
+	res := strings.Builder{}
+
+	res.WriteString("Начальный запрос\n\n```" +
 		text +
-		"```\n\nСгенерированный ответ\n\n"
+		"```\n\nСгенерированный ответ\n\n")
 
-	generatedText := fmt.Sprint(contentString)
-
+	var generatedText string
 	for _, content := range str.Choices {
-		generatedText = fmt.Sprint(generatedText, content.Message.Content, " ")
+		generatedText += content.Message.Content + " "
 	}
 
-	contentString = fmt.Sprint("```", generatedText, "```", "\n\n", "Отправить ответ?")
+	res.WriteString("```" + generatedText + "```\n\nОтправить ответ?")
 
 	var buttons [][]models.InlineKeyboardButton
 	var agreementButtons []models.InlineKeyboardButton
@@ -121,7 +122,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 
 	markup := models.InlineKeyboardMarkup{InlineKeyboard: buttons}
 
-	_, err = b.SendMessage(ctx, &bot.SendMessageParams{ChatID: a.cfg.Bot.MainUserId, Text: contentString, ReplyMarkup: markup})
+	_, err = b.SendMessage(ctx, &bot.SendMessageParams{ChatID: a.cfg.Bot.MainUserId, Text: res.String(), ReplyMarkup: markup, ParseMode: models.ParseModeMarkdown})
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
