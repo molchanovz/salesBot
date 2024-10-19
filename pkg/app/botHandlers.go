@@ -105,7 +105,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 		return
 	}
 
-	jsonParams := "{  \"messageId\": \"" + strconv.Itoa(message.ID) + "\",\n  \"TgID\": " + strconv.Itoa(chatId) + "\n}"
+	jsonParams := "{  \"messageId\": " + strconv.Itoa(message.ID) + ",\n  \"TgID\": " + strconv.Itoa(chatId) + "\n}"
 
 	fmt.Println(jsonParams)
 
