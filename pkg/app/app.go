@@ -26,25 +26,25 @@ type Config struct {
 
 type App struct {
 	embedlog.Logger
-	appName    string
-	cfg        Config
-	db         db.DB
-	dbc        *pg.DB
-	commonRepo db.CommonRepo
-	echo       *echo.Echo
-	vtsrv      zenrpc.Server
-	b          *bot.Bot
-	g          *gigaChat.GigaChat
+	appName string
+	cfg     Config
+	db      db.DB
+	dbc     *pg.DB
+	sr      db.SalesbotRepo
+	echo    *echo.Echo
+	vtsrv   zenrpc.Server
+	b       *bot.Bot
+	g       *gigaChat.GigaChat
 }
 
 func New(appName string, verbose bool, cfg Config, dbo db.DB, dbc *pg.DB) *App {
 	a := &App{
-		appName:    appName,
-		cfg:        cfg,
-		db:         dbo,
-		dbc:        dbc,
-		commonRepo: db.NewCommonRepo(dbo),
-		echo:       echo.New(),
+		appName: appName,
+		cfg:     cfg,
+		db:      dbo,
+		dbc:     dbc,
+		sr:      db.NewSalesbotRepo(dbo),
+		echo:    echo.New(),
 	}
 	a.SetStdLoggers(verbose)
 	a.echo.HideBanner = true
