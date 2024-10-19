@@ -1,0 +1,11 @@
+<Project xmlns:xsi="" xmlns:xsd="">
+    <Name>salesBot.mfd</Name>
+    <PackageNames>
+        <string>salesbot</string>
+    </PackageNames>
+    <Languages>
+        <string>en</string>
+    </Languages>
+    <GoPGVer>10</GoPGVer>
+    <CustomTypes></CustomTypes>
+</Project>

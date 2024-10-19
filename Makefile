@@ -51,14 +51,14 @@ mod:
 
 NS := "NONE"
 
-MAPPING := "common:users;vfs:vfsFiles,vfsFolders"
+MAPPING := "salesbot:salesbot.gigachatmessages"
 
 mfd-xml:
-	@mfd-generator xml -c "postgres://postgres:postgres@localhost:5432/apisrv?sslmode=disable" -m ./docs/model/apisrv.mfd -n $(MAPPING)
+	@mfd-generator xml -c "postgres://postgres:postgres@localhost:5432/apisrv?sslmode=disable" -m ./docs/model/salesBot.mfd -n $(MAPPING)
 mfd-model:
-	@mfd-generator model -m ./docs/model/apisrv.mfd -p db -o ./pkg/db
+	@mfd-generator model -m ./docs/model/salesBot.mfd -p db -o ./pkg/db
 mfd-repo: --check-ns
-	@mfd-generator repo -m ./docs/model/apisrv.mfd -p db -o ./pkg/db -n $(NS)
+	@mfd-generator repo -m ./docs/model/salesBot.mfd -p db -o ./pkg/db -n $(NS)
 mfd-vt-xml:
 	@mfd-generator xml-vt -m ./docs/model/apisrv.mfd
 mfd-vt-rpc: --check-ns
