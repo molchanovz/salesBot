@@ -94,7 +94,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 	var buttons [][]models.InlineKeyboardButton
 	var agreementButtons []models.InlineKeyboardButton
 
-	message, err := a.sr.AddGigachatMessage(ctx, &db.GigachatMessage{Message: text})
+	message, err := a.sr.AddGigachatMessage(ctx, &db.GigachatMessage{Message: generatedText})
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
