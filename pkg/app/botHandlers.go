@@ -48,7 +48,7 @@ func (a *App) handleAgree(ctx context.Context, b *bot.Bot, update *models.Update
 
 	a.Logger.Printf("Наш юзер %d", params.TgID)
 
-	c := sales.NewDefaultClient("http://91.222.239.37:8080/v1/rpc/")
+	c := sales.NewDefaultClient("http://91.222.239.37:8080/v1/rpc/", a.cfg.Client.Token)
 
 	message, err := a.sr.GigachatMessageByID(ctx, params.MessageId)
 	if err != nil {

@@ -3,6 +3,9 @@ Token = ""
 SupportChatId = ""
 MainUserId = 0
 
+[Client]
+Token = ""
+
 [Database]
 Addr = "localhost:5432"
 User = "postgres"

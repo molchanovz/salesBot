@@ -26,9 +26,9 @@ type Client struct {
 	Sales *svcSales
 }
 
-func NewDefaultClient(endpoint string) *Client {
+func NewDefaultClient(endpoint string, authToken string) *Client {
 	header := http.Header{}
-	header.Set("Authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJib3RVc2VySUQiOjYsInBob25lIjoiODk5NTc5OTM5NzkiLCJleHAiOjE3MzE4NDM2NTF9.bt6_8aOOd-uV4tqjYUCv7dWjCjI_8TDFZOIw7gSIPDs")
+	header.Set("Authorization", authToken)
 	return NewClient(endpoint, header, &http.Client{})
 }
 

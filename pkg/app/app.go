@@ -21,6 +21,9 @@ type Config struct {
 		SupportChatId string
 		MainUserId    int
 	}
+	Client struct {
+		Token string
+	}
 	GigaChat gigaChat.GigaChatConfig
 	AmoCRM   amoCRM.AmoCRMConfig
 	Database *pg.Options
