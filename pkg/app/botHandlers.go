@@ -152,6 +152,8 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 		Text: "Нет", CallbackData: CallBackPatternRefusement + jsonParams},
 	)
 
+	fmt.Println(agreementButtons[0].CallbackData)
+
 	buttons = append(buttons, agreementButtons)
 
 	markup := models.InlineKeyboardMarkup{InlineKeyboard: buttons}
