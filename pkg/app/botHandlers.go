@@ -145,7 +145,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 	fmt.Println(jsonParams)
 
 	agreementButtons = append(agreementButtons, models.InlineKeyboardButton{
-		Text: "Да", CallbackData: CallBackPatternAgreement + jsonParams},
+		Text: "Да", CallbackData: CallBackPatternAgreement + "1"}, // TODO: test 1
 	)
 
 	agreementButtons = append(agreementButtons, models.InlineKeyboardButton{
