@@ -38,14 +38,13 @@ func (a *App) someHandler(ctx context.Context, b *bot.Bot, update *models.Update
 }
 
 func (a *App) handleAgree(ctx context.Context, b *bot.Bot, update *models.Update) {
+	println("Кнопка нажалась")
 	callBackData := update.CallbackQuery.Data[len(CallBackPatternAgreement):]
 	params, err := NewCallbackDataParams(callBackData)
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
 	}
-
-	println("Наш юзер " + strconv.Itoa(params.TgID))
 
 	a.Logger.Printf("Наш юзер %d", params.TgID)
 
