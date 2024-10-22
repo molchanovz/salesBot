@@ -13,13 +13,15 @@ import (
 )
 
 const (
-	somePattern              = "/some"
-	CallBackPatternAgreement = "agree_"
+	somePattern               = "/some"
+	CallBackPatternAgreement  = "agree_"
+	CallBackPatternRefusement = "refuse_"
 )
 
 func (a *App) registerBotHandlers() {
 	a.b.RegisterHandler(bot.HandlerTypeMessageText, somePattern, bot.MatchTypePrefix, a.someHandler)
-	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternAgreement, bot.MatchTypePrefix, a.handleInfo)
+	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternAgreement, bot.MatchTypePrefix, a.handleAgree)
+	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternAgreement, bot.MatchTypePrefix, a.handleRefuse)
 
 }
 
@@ -35,7 +37,7 @@ func (a *App) someHandler(ctx context.Context, b *bot.Bot, update *models.Update
 	a.processGigachatAnswer(ctx, b, req, chatId)
 }
 
-func (a *App) handleInfo(ctx context.Context, b *bot.Bot, update *models.Update) {
+func (a *App) handleAgree(ctx context.Context, b *bot.Bot, update *models.Update) {
 	callBackData := update.CallbackQuery.Data[len(CallBackPatternAgreement):]
 	params, err := NewCallbackDataParams(callBackData)
 	if err != nil {
@@ -65,6 +67,37 @@ func (a *App) handleInfo(ctx context.Context, b *bot.Bot, update *models.Update)
 	}
 
 	fmt.Printf("Инфо: %+v", info)
+}
+
+func (a *App) handleRefuse(ctx context.Context, b *bot.Bot, update *models.Update) {
+	callBackData := update.CallbackQuery.Data[len(CallBackPatternRefusement):]
+	params, err := NewCallbackDataParams(callBackData)
+	if err != nil {
+		a.Logger.Errorf("%v", err)
+		return
+	}
+
+	a.Logger.Printf("Сообщение, которое будет изменено %v", params.MessageId)
+
+	message, err := a.sr.GigachatMessageByID(ctx, params.MessageId)
+	if err != nil {
+		a.Logger.Errorf("%v", err)
+		return
+	}
+
+	if message == nil {
+		a.Logger.Errorf("empty")
+		return
+	}
+
+	cmdForEdit := "Новое сообщение отправьте /edit+" + strconv.Itoa(params.MessageId)
+
+	_, err = b.SendMessage(ctx, &bot.SendMessageParams{ChatID: update.CallbackQuery.From.ID, Text: cmdForEdit, ParseMode: models.ParseModeMarkdown})
+	if err != nil {
+		a.Logger.Errorf("%v", err)
+		return
+	}
+
 }
 
 /*
@@ -111,18 +144,16 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 	fmt.Println(jsonParams)
 
 	agreementButtons = append(agreementButtons, models.InlineKeyboardButton{
-		Text: "Да", CallbackData: "agree_" + jsonParams},
+		Text: "Да", CallbackData: CallBackPatternAgreement + jsonParams},
 	)
 
 	agreementButtons = append(agreementButtons, models.InlineKeyboardButton{
-		Text: "Нет", CallbackData: "refuse"},
+		Text: "Нет", CallbackData: CallBackPatternRefusement + jsonParams},
 	)
 
 	buttons = append(buttons, agreementButtons)
 
 	markup := models.InlineKeyboardMarkup{InlineKeyboard: buttons}
-
-	fmt.Printf("Пытаемся поймать конакт: %v\n", a.crm.GetContact(a.crm.Token, 1185541))
 
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{ChatID: a.cfg.Bot.MainUserId, Text: res.String(), ReplyMarkup: markup, ParseMode: models.ParseModeMarkdown})
 	if err != nil {
@@ -135,6 +166,9 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 func (a App) sendWebhookResult(message WebhookMessage) {
 	ctx := context.Background()
 	if strings.Contains(strings.ToLower(message.Message), "двер") {
+
+		// TODO принимать информацию контакта для a.crm.AddContact()
+
 		a.processGigachatAnswer(ctx, a.b, message.Message, message.ChatTGId)
 	}
 }

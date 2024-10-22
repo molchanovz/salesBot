@@ -69,8 +69,6 @@ func (crm AmoCRM) GetContact(token string, id int) string {
 	req.Header.Set("Authorization", "Bearer "+token)
 
 	client := &http.Client{}
-
-	fmt.Println(req)
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatalf("Ошибка выполнения запроса: %v", err)
@@ -83,7 +81,6 @@ func (crm AmoCRM) GetContact(token string, id int) string {
 	// Если статус не 200 OK, выводим детальную ошибку и тело ответа
 	if resp.StatusCode != http.StatusOK {
 		log.Printf("Ошибка: получен статус %s", resp.Status)
-		log.Printf("Тело ответа: %s", string(responseBody))
 		return string(responseBody) // Возвращаем тело для отладки
 	}
 
@@ -110,8 +107,6 @@ func (crm AmoCRM) GetLead(token string, id int) string {
 	req.Header.Set("Authorization", "Bearer "+token)
 
 	client := &http.Client{}
-
-	fmt.Println(req)
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatalf("Ошибка выполнения запроса: %v", err)
@@ -136,7 +131,24 @@ func (crm AmoCRM) GetLead(token string, id int) string {
 /*
 Добавление одного контакта в AmoCRM
 */
-func (crm AmoCRM) AddContact(token string, contacts Contacts) string {
+func (crm AmoCRM) AddContact(token string) string {
+
+	telephoneNumValue := Value{Value: "88005553535", EnumId: 273245, EnumCode: "WORK"}
+	telephoneNumValues := Values{telephoneNumValue}
+
+	telegramNicknameValue := Value{Value: "@molchanovz"}
+	telegramNicknameValues := Values{telegramNicknameValue}
+
+	telegramRequestValue := Value{Value: "У меня сломалась дверь, знает кто-нибудь хороших специалистов?"}
+	telegramRequestValues := Values{telegramRequestValue}
+
+	telephoneNumField := CustomFieldsValue{Values: telephoneNumValues, FieldName: "Телефон", FieldId: 312455, FieldCode: "PHONE"}
+	telegramNicknameField := CustomFieldsValue{Values: telegramNicknameValues, FieldName: "Ник телеграм", FieldId: 337421}
+	telegramRequestField := CustomFieldsValue{Values: telegramRequestValues, FieldName: "Запрос", FieldId: 338825}
+
+	customFieldsValues := CustomFieldsValues{telephoneNumField, telegramNicknameField, telegramRequestField}
+	contacts := Contacts{Contact{FirstName: "Сергей", LastName: "Молчанов", CustomFieldsValues: customFieldsValues}}
+
 	url := "https://molchanovtop.amocrm.ru/api/v4/contacts"
 
 	body, err := json.Marshal(contacts)
