@@ -122,15 +122,17 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 
 	markup := models.InlineKeyboardMarkup{InlineKeyboard: buttons}
 
+	fmt.Printf("Пытаемся поймать конакт: %v\n", a.crm.GetContact(a.crm.Token, 1185541))
+
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{ChatID: a.cfg.Bot.MainUserId, Text: res.String(), ReplyMarkup: markup, ParseMode: models.ParseModeMarkdown})
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
 	}
+
 }
 
 func (a App) sendWebhookResult(message WebhookMessage) {
-
 	ctx := context.Background()
 	if strings.Contains(strings.ToLower(message.Message), "двер") {
 		a.processGigachatAnswer(ctx, a.b, message.Message, message.ChatTGId)

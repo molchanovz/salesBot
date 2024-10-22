@@ -1,6 +1,7 @@
 package app
 
 import (
+	"apisrv/pkg/amoCRM"
 	"apisrv/pkg/gigaChat"
 	"context"
 	"github.com/go-telegram/bot"
@@ -21,6 +22,7 @@ type Config struct {
 		MainUserId    int
 	}
 	GigaChat gigaChat.GigaChatConfig
+	AmoCRM   amoCRM.AmoCRMConfig
 	Database *pg.Options
 }
 
@@ -35,6 +37,7 @@ type App struct {
 	vtsrv   zenrpc.Server
 	b       *bot.Bot
 	g       *gigaChat.GigaChat
+	crm     *amoCRM.AmoCRM
 }
 
 func New(appName string, verbose bool, cfg Config, dbo db.DB, dbc *pg.DB) *App {
@@ -53,6 +56,7 @@ func New(appName string, verbose bool, cfg Config, dbo db.DB, dbc *pg.DB) *App {
 	opts := []bot.Option{}
 	a.b, _ = bot.New(cfg.Bot.Token, opts...)
 	a.g = gigaChat.NewGigaChat(cfg.GigaChat)
+	a.crm = amoCRM.NewAmoCRM(cfg.AmoCRM)
 	//a.vtsrv = vt.New(a.db, a.Logger, a.cfg.Server.IsDevel)
 
 	return a
