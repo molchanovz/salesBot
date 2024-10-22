@@ -21,7 +21,7 @@ const (
 func (a *App) registerBotHandlers() {
 	a.b.RegisterHandler(bot.HandlerTypeMessageText, somePattern, bot.MatchTypePrefix, a.someHandler)
 	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternAgreement, bot.MatchTypePrefix, a.handleAgree)
-	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternAgreement, bot.MatchTypePrefix, a.handleRefuse)
+	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternRefusement, bot.MatchTypePrefix, a.handleRefuse)
 
 }
 
@@ -44,6 +44,8 @@ func (a *App) handleAgree(ctx context.Context, b *bot.Bot, update *models.Update
 		a.Logger.Errorf("%v", err)
 		return
 	}
+
+	println("Наш юзер " + strconv.Itoa(params.TgID))
 
 	a.Logger.Printf("Наш юзер %d", params.TgID)
 
