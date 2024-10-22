@@ -38,7 +38,7 @@ func (a *App) someHandler(ctx context.Context, b *bot.Bot, update *models.Update
 }
 
 func (a *App) handleAgree(ctx context.Context, b *bot.Bot, update *models.Update) {
-	println("Кнопка нажалась")
+	a.Logger.Printf("Кнопка нажалась")
 	callBackData := update.CallbackQuery.Data[len(CallBackPatternAgreement):]
 	params, err := NewCallbackDataParams(callBackData)
 	if err != nil {
