@@ -35,7 +35,7 @@ type App struct {
 	cfg     Config
 	db      db.DB
 	dbc     *pg.DB
-	sr      db.SalesbotRepo
+	gr      db.GigachatRepo
 	echo    *echo.Echo
 	vtsrv   zenrpc.Server
 	b       *bot.Bot
@@ -49,7 +49,7 @@ func New(appName string, verbose bool, cfg Config, dbo db.DB, dbc *pg.DB) *App {
 		cfg:     cfg,
 		db:      dbo,
 		dbc:     dbc,
-		sr:      db.NewSalesbotRepo(dbo),
+		gr:      db.NewGigachatRepo(dbo),
 		echo:    echo.New(),
 	}
 	a.SetStdLoggers(verbose)

@@ -55,6 +55,7 @@ type GigachatMessageSearch struct {
 
 	ID           *int
 	Message      *string
+	Tgid         *int
 	IDs          []int
 	MessageILike *string
 }
@@ -68,6 +69,9 @@ func (gms *GigachatMessageSearch) Apply(query *orm.Query) *orm.Query {
 	}
 	if gms.Message != nil {
 		gms.where(query, Tables.GigachatMessage.Alias, Columns.GigachatMessage.Message, gms.Message)
+	}
+	if gms.Tgid != nil {
+		gms.where(query, Tables.GigachatMessage.Alias, Columns.GigachatMessage.Tgid, gms.Tgid)
 	}
 	if len(gms.IDs) > 0 {
 		Filter{Columns.GigachatMessage.ID, gms.IDs, SearchTypeArray, false}.Apply(query)

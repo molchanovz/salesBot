@@ -20,6 +20,7 @@ const (
 
 func (a *App) registerBotHandlers() {
 	a.b.RegisterHandler(bot.HandlerTypeMessageText, somePattern, bot.MatchTypePrefix, a.someHandler)
+	a.b.RegisterHandler(bot.HandlerTypeMessageText, somePattern, bot.MatchTypePrefix, a.editMessageHandler)
 	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternAgreement, bot.MatchTypePrefix, a.handleAgree)
 	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternRefusement, bot.MatchTypePrefix, a.handleRefuse)
 
@@ -37,6 +38,42 @@ func (a *App) someHandler(ctx context.Context, b *bot.Bot, update *models.Update
 	a.processGigachatAnswer(ctx, b, req, chatId)
 }
 
+func (a *App) editMessageHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
+	req := update.Message.Text
+	if req == "" {
+		a.Logger.Errorf("Запрос пустой")
+		return
+	}
+
+	parts := strings.SplitN(req, " ", 2)
+	firstPart := parts[0]
+	handlerMsgId := strings.SplitN(firstPart, "_", 2)
+	msgId, _ := strconv.Atoi(handlerMsgId[1])
+
+	request := parts[1]
+
+	c := sales.NewDefaultClient("http://91.222.239.37:8080/v1/rpc/", a.cfg.Client.Token)
+
+	message, err := a.gr.GigachatMessageByID(ctx, msgId)
+	if err != nil {
+		a.Logger.Errorf("%v", err)
+		return
+	}
+
+	if message == nil {
+		a.Logger.Errorf("empty")
+		return
+	}
+
+	info, err := c.Sales.SendTextMessageByTgChatID(ctx, *message.Tgid, request)
+	if err != nil {
+		a.Logger.Errorf("%v", err)
+		return
+	}
+
+	fmt.Printf("Инфо при отправке сообщения: %+v", info)
+}
+
 func (a *App) handleAgree(ctx context.Context, b *bot.Bot, update *models.Update) {
 	callBackData := update.CallbackQuery.Data[len(CallBackPatternAgreement):]
 	params, err := NewCallbackDataParams(callBackData)
@@ -49,7 +86,7 @@ func (a *App) handleAgree(ctx context.Context, b *bot.Bot, update *models.Update
 
 	c := sales.NewDefaultClient("http://91.222.239.37:8080/v1/rpc/", a.cfg.Client.Token)
 
-	message, err := a.sr.GigachatMessageByID(ctx, params.MessageId)
+	message, err := a.gr.GigachatMessageByID(ctx, params.MessageId)
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
@@ -77,7 +114,7 @@ func (a *App) handleRefuse(ctx context.Context, b *bot.Bot, update *models.Updat
 		return
 	}
 
-	message, err := a.sr.GigachatMessageByID(ctx, params.MessageId)
+	message, err := a.gr.GigachatMessageByID(ctx, params.MessageId)
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
@@ -88,9 +125,11 @@ func (a *App) handleRefuse(ctx context.Context, b *bot.Bot, update *models.Updat
 		return
 	}
 
-	cmdForEdit := "Новое сообщение отправьте /edit" + strconv.Itoa(params.MessageId)
+	var cmdForEdit strings.Builder
+	cmdForEdit.WriteString("Чтобы изменить сообщение скопируйте текст ниже, напишите новый ответ и отправьте в чат\n")
+	cmdForEdit.WriteString("`/edit_" + strconv.Itoa(params.MessageId) + " `")
 
-	_, err = b.SendMessage(ctx, &bot.SendMessageParams{ChatID: update.CallbackQuery.From.ID, Text: cmdForEdit, ParseMode: models.ParseModeMarkdown})
+	_, err = b.SendMessage(ctx, &bot.SendMessageParams{ChatID: update.CallbackQuery.From.ID, Text: cmdForEdit.String(), ParseMode: models.ParseModeMarkdown})
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
@@ -126,30 +165,26 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 	var buttons [][]models.InlineKeyboardButton
 	var agreementButtons []models.InlineKeyboardButton
 
-	message, err := a.sr.AddGigachatMessage(ctx, &db.GigachatMessage{Message: generatedText})
+	message, err := a.gr.AddGigachatMessage(ctx, &db.GigachatMessage{Message: generatedText, Tgid: &chatId})
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
 	}
 
 	if message == nil {
-		println("empty msg")
+		a.Logger.Errorf("empty msg")
 		return
 	}
 
 	jsonParams := "{  \"messageId\": " + strconv.Itoa(message.ID) + ",\n  \"TgID\": " + strconv.Itoa(chatId) + "\n}"
-
-	fmt.Println(jsonParams)
 
 	agreementButtons = append(agreementButtons, models.InlineKeyboardButton{
 		Text: "Да", CallbackData: CallBackPatternAgreement + jsonParams},
 	)
 
 	agreementButtons = append(agreementButtons, models.InlineKeyboardButton{
-		Text: "Нет", CallbackData: CallBackPatternRefusement + jsonParams},
+		Text: "Изменить", CallbackData: CallBackPatternRefusement + jsonParams},
 	)
-
-	fmt.Println(agreementButtons[0].CallbackData)
 
 	buttons = append(buttons, agreementButtons)
 

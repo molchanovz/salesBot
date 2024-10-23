@@ -6,14 +6,15 @@ package db
 
 var Columns = struct {
 	GigachatMessage struct {
-		ID, Message string
+		ID, Message, Tgid string
 	}
 }{
 	GigachatMessage: struct {
-		ID, Message string
+		ID, Message, Tgid string
 	}{
 		ID:      "messageid",
 		Message: "message",
+		Tgid:    "tgid",
 	},
 }
 
@@ -25,14 +26,15 @@ var Tables = struct {
 	GigachatMessage: struct {
 		Name, Alias string
 	}{
-		Name:  "studup.gigachatmessages",
+		Name:  "gigachatMessages",
 		Alias: "t",
 	},
 }
 
 type GigachatMessage struct {
-	tableName struct{} `pg:"studup.gigachatmessages,alias:t,discard_unknown_columns"`
+	tableName struct{} `pg:"gigachatMessages,alias:t,discard_unknown_columns"`
 
 	ID      int    `pg:"messageid,pk"`
 	Message string `pg:"message,use_zero"`
+	Tgid    *int   `pg:"tgid"`
 }
