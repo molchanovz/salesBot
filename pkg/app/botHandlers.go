@@ -54,7 +54,7 @@ func (a *App) editMessageHandler(ctx context.Context, b *bot.Bot, update *models
 
 	c := sales.NewDefaultClient("http://91.222.239.37:8080/v1/rpc/", a.cfg.Client.Token)
 
-	message, err := a.gr.GigachatmessageByID(ctx, msgId)
+	message, err := a.sr.GigachatmessageByID(ctx, msgId)
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
@@ -86,7 +86,7 @@ func (a *App) handleAgree(ctx context.Context, b *bot.Bot, update *models.Update
 
 	c := sales.NewDefaultClient("http://91.222.239.37:8080/v1/rpc/", a.cfg.Client.Token)
 
-	message, err := a.gr.GigachatmessageByID(ctx, params.MessageId)
+	message, err := a.sr.GigachatmessageByID(ctx, params.MessageId)
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
@@ -114,7 +114,7 @@ func (a *App) handleRefuse(ctx context.Context, b *bot.Bot, update *models.Updat
 		return
 	}
 
-	message, err := a.gr.GigachatmessageByID(ctx, params.MessageId)
+	message, err := a.sr.GigachatmessageByID(ctx, params.MessageId)
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
@@ -165,7 +165,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 	var buttons [][]models.InlineKeyboardButton
 	var agreementButtons []models.InlineKeyboardButton
 
-	message, err := a.gr.AddGigachatmessage(ctx, &db.Gigachatmessage{Message: generatedText, Tgid: &chatId})
+	message, err := a.sr.AddGigachatmessage(ctx, &db.Gigachatmessage{Message: generatedText, Tgid: &chatId})
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
