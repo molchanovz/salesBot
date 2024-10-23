@@ -38,7 +38,6 @@ func (a *App) someHandler(ctx context.Context, b *bot.Bot, update *models.Update
 }
 
 func (a *App) handleAgree(ctx context.Context, b *bot.Bot, update *models.Update) {
-	a.Logger.Printf("Кнопка нажалась")
 	callBackData := update.CallbackQuery.Data[len(CallBackPatternAgreement):]
 	params, err := NewCallbackDataParams(callBackData)
 	if err != nil {
@@ -78,8 +77,6 @@ func (a *App) handleRefuse(ctx context.Context, b *bot.Bot, update *models.Updat
 		return
 	}
 
-	a.Logger.Printf("Сообщение, которое будет изменено %v", params.MessageId)
-
 	message, err := a.sr.GigachatMessageByID(ctx, params.MessageId)
 	if err != nil {
 		a.Logger.Errorf("%v", err)
@@ -91,7 +88,7 @@ func (a *App) handleRefuse(ctx context.Context, b *bot.Bot, update *models.Updat
 		return
 	}
 
-	cmdForEdit := "Новое сообщение отправьте /edit+" + strconv.Itoa(params.MessageId)
+	cmdForEdit := "Новое сообщение отправьте /edit" + strconv.Itoa(params.MessageId)
 
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{ChatID: update.CallbackQuery.From.ID, Text: cmdForEdit, ParseMode: models.ParseModeMarkdown})
 	if err != nil {
