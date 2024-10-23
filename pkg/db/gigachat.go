@@ -21,10 +21,12 @@ func NewGigachatRepo(db orm.DB) GigachatRepo {
 		db:      db,
 		filters: map[string][]Filter{},
 		sort: map[string][]SortField{
-			Tables.Gigachatmessage.Name: {{Column: Columns.Gigachatmessage.ID, Direction: SortDesc}},
+			Tables.Gigachatmessage.Name:       {{Column: Columns.Gigachatmessage.ID, Direction: SortDesc}},
+			Tables.StudupGigachatmessage.Name: {{Column: Columns.StudupGigachatmessage.ID, Direction: SortDesc}},
 		},
 		join: map[string][]string{
-			Tables.Gigachatmessage.Name: {TableColumns},
+			Tables.Gigachatmessage.Name:       {TableColumns},
+			Tables.StudupGigachatmessage.Name: {TableColumns},
 		},
 	}
 }
@@ -119,6 +121,84 @@ func (gr GigachatRepo) DeleteGigachatmessage(ctx context.Context, id int) (delet
 	gigachatmessage := &Gigachatmessage{ID: id}
 
 	res, err := gr.db.ModelContext(ctx, gigachatmessage).WherePK().Delete()
+	if err != nil {
+		return false, err
+	}
+
+	return res.RowsAffected() > 0, err
+}
+
+/*** StudupGigachatmessage ***/
+
+// FullStudupGigachatmessage returns full joins with all columns
+func (gr GigachatRepo) FullStudupGigachatmessage() OpFunc {
+	return WithColumns(gr.join[Tables.StudupGigachatmessage.Name]...)
+}
+
+// DefaultStudupGigachatmessageSort returns default sort.
+func (gr GigachatRepo) DefaultStudupGigachatmessageSort() OpFunc {
+	return WithSort(gr.sort[Tables.StudupGigachatmessage.Name]...)
+}
+
+// StudupGigachatmessageByID is a function that returns StudupGigachatmessage by ID(s) or nil.
+func (gr GigachatRepo) StudupGigachatmessageByID(ctx context.Context, id int, ops ...OpFunc) (*StudupGigachatmessage, error) {
+	return gr.OneStudupGigachatmessage(ctx, &StudupGigachatmessageSearch{ID: &id}, ops...)
+}
+
+// OneStudupGigachatmessage is a function that returns one StudupGigachatmessage by filters. It could return pg.ErrMultiRows.
+func (gr GigachatRepo) OneStudupGigachatmessage(ctx context.Context, search *StudupGigachatmessageSearch, ops ...OpFunc) (*StudupGigachatmessage, error) {
+	obj := &StudupGigachatmessage{}
+	err := buildQuery(ctx, gr.db, obj, search, gr.filters[Tables.StudupGigachatmessage.Name], PagerTwo, ops...).Select()
+
+	if errors.Is(err, pg.ErrMultiRows) {
+		return nil, err
+	} else if errors.Is(err, pg.ErrNoRows) {
+		return nil, nil
+	}
+
+	return obj, err
+}
+
+// StudupGigachatmessagesByFilters returns StudupGigachatmessage list.
+func (gr GigachatRepo) StudupGigachatmessagesByFilters(ctx context.Context, search *StudupGigachatmessageSearch, pager Pager, ops ...OpFunc) (studupGigachatmessages []StudupGigachatmessage, err error) {
+	err = buildQuery(ctx, gr.db, &studupGigachatmessages, search, gr.filters[Tables.StudupGigachatmessage.Name], pager, ops...).Select()
+	return
+}
+
+// CountStudupGigachatmessages returns count
+func (gr GigachatRepo) CountStudupGigachatmessages(ctx context.Context, search *StudupGigachatmessageSearch, ops ...OpFunc) (int, error) {
+	return buildQuery(ctx, gr.db, &StudupGigachatmessage{}, search, gr.filters[Tables.StudupGigachatmessage.Name], PagerOne, ops...).Count()
+}
+
+// AddStudupGigachatmessage adds StudupGigachatmessage to DB.
+func (gr GigachatRepo) AddStudupGigachatmessage(ctx context.Context, studupGigachatmessage *StudupGigachatmessage, ops ...OpFunc) (*StudupGigachatmessage, error) {
+	q := gr.db.ModelContext(ctx, studupGigachatmessage)
+	applyOps(q, ops...)
+	_, err := q.Insert()
+
+	return studupGigachatmessage, err
+}
+
+// UpdateStudupGigachatmessage updates StudupGigachatmessage in DB.
+func (gr GigachatRepo) UpdateStudupGigachatmessage(ctx context.Context, studupGigachatmessage *StudupGigachatmessage, ops ...OpFunc) (bool, error) {
+	q := gr.db.ModelContext(ctx, studupGigachatmessage).WherePK()
+	if len(ops) == 0 {
+		q = q.ExcludeColumn(Columns.StudupGigachatmessage.ID)
+	}
+	applyOps(q, ops...)
+	res, err := q.Update()
+	if err != nil {
+		return false, err
+	}
+
+	return res.RowsAffected() > 0, err
+}
+
+// DeleteStudupGigachatmessage deletes StudupGigachatmessage from DB.
+func (gr GigachatRepo) DeleteStudupGigachatmessage(ctx context.Context, id int) (deleted bool, err error) {
+	studupGigachatmessage := &StudupGigachatmessage{ID: id}
+
+	res, err := gr.db.ModelContext(ctx, studupGigachatmessage).WherePK().Delete()
 	if err != nil {
 		return false, err
 	}
