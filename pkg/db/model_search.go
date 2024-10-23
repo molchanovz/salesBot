@@ -50,7 +50,7 @@ type Searcher interface {
 	WithApply(a applier)
 }
 
-type GigachatMessageSearch struct {
+type GigachatmessageSearch struct {
 	search
 
 	ID           *int
@@ -60,36 +60,36 @@ type GigachatMessageSearch struct {
 	MessageILike *string
 }
 
-func (gms *GigachatMessageSearch) Apply(query *orm.Query) *orm.Query {
-	if gms == nil {
+func (gs *GigachatmessageSearch) Apply(query *orm.Query) *orm.Query {
+	if gs == nil {
 		return query
 	}
-	if gms.ID != nil {
-		gms.where(query, Tables.GigachatMessage.Alias, Columns.GigachatMessage.ID, gms.ID)
+	if gs.ID != nil {
+		gs.where(query, Tables.Gigachatmessage.Alias, Columns.Gigachatmessage.ID, gs.ID)
 	}
-	if gms.Message != nil {
-		gms.where(query, Tables.GigachatMessage.Alias, Columns.GigachatMessage.Message, gms.Message)
+	if gs.Message != nil {
+		gs.where(query, Tables.Gigachatmessage.Alias, Columns.Gigachatmessage.Message, gs.Message)
 	}
-	if gms.Tgid != nil {
-		gms.where(query, Tables.GigachatMessage.Alias, Columns.GigachatMessage.Tgid, gms.Tgid)
+	if gs.Tgid != nil {
+		gs.where(query, Tables.Gigachatmessage.Alias, Columns.Gigachatmessage.Tgid, gs.Tgid)
 	}
-	if len(gms.IDs) > 0 {
-		Filter{Columns.GigachatMessage.ID, gms.IDs, SearchTypeArray, false}.Apply(query)
+	if len(gs.IDs) > 0 {
+		Filter{Columns.Gigachatmessage.ID, gs.IDs, SearchTypeArray, false}.Apply(query)
 	}
-	if gms.MessageILike != nil {
-		Filter{Columns.GigachatMessage.Message, *gms.MessageILike, SearchTypeILike, false}.Apply(query)
+	if gs.MessageILike != nil {
+		Filter{Columns.Gigachatmessage.Message, *gs.MessageILike, SearchTypeILike, false}.Apply(query)
 	}
 
-	gms.apply(query)
+	gs.apply(query)
 
 	return query
 }
 
-func (gms *GigachatMessageSearch) Q() applier {
+func (gs *GigachatmessageSearch) Q() applier {
 	return func(query *orm.Query) (*orm.Query, error) {
-		if gms == nil {
+		if gs == nil {
 			return query, nil
 		}
-		return gms.Apply(query), nil
+		return gs.Apply(query), nil
 	}
 }

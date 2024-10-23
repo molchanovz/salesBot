@@ -21,10 +21,10 @@ func NewGigachatRepo(db orm.DB) GigachatRepo {
 		db:      db,
 		filters: map[string][]Filter{},
 		sort: map[string][]SortField{
-			Tables.GigachatMessage.Name: {{Column: Columns.GigachatMessage.ID, Direction: SortDesc}},
+			Tables.Gigachatmessage.Name: {{Column: Columns.Gigachatmessage.ID, Direction: SortDesc}},
 		},
 		join: map[string][]string{
-			Tables.GigachatMessage.Name: {TableColumns},
+			Tables.Gigachatmessage.Name: {TableColumns},
 		},
 	}
 }
@@ -48,27 +48,27 @@ func (gr GigachatRepo) WithEnabledOnly() GigachatRepo {
 	return gr
 }
 
-/*** GigachatMessage ***/
+/*** Gigachatmessage ***/
 
-// FullGigachatMessage returns full joins with all columns
-func (gr GigachatRepo) FullGigachatMessage() OpFunc {
-	return WithColumns(gr.join[Tables.GigachatMessage.Name]...)
+// FullGigachatmessage returns full joins with all columns
+func (gr GigachatRepo) FullGigachatmessage() OpFunc {
+	return WithColumns(gr.join[Tables.Gigachatmessage.Name]...)
 }
 
-// DefaultGigachatMessageSort returns default sort.
-func (gr GigachatRepo) DefaultGigachatMessageSort() OpFunc {
-	return WithSort(gr.sort[Tables.GigachatMessage.Name]...)
+// DefaultGigachatmessageSort returns default sort.
+func (gr GigachatRepo) DefaultGigachatmessageSort() OpFunc {
+	return WithSort(gr.sort[Tables.Gigachatmessage.Name]...)
 }
 
-// GigachatMessageByID is a function that returns GigachatMessage by ID(s) or nil.
-func (gr GigachatRepo) GigachatMessageByID(ctx context.Context, id int, ops ...OpFunc) (*GigachatMessage, error) {
-	return gr.OneGigachatMessage(ctx, &GigachatMessageSearch{ID: &id}, ops...)
+// GigachatmessageByID is a function that returns Gigachatmessage by ID(s) or nil.
+func (gr GigachatRepo) GigachatmessageByID(ctx context.Context, id int, ops ...OpFunc) (*Gigachatmessage, error) {
+	return gr.OneGigachatmessage(ctx, &GigachatmessageSearch{ID: &id}, ops...)
 }
 
-// OneGigachatMessage is a function that returns one GigachatMessage by filters. It could return pg.ErrMultiRows.
-func (gr GigachatRepo) OneGigachatMessage(ctx context.Context, search *GigachatMessageSearch, ops ...OpFunc) (*GigachatMessage, error) {
-	obj := &GigachatMessage{}
-	err := buildQuery(ctx, gr.db, obj, search, gr.filters[Tables.GigachatMessage.Name], PagerTwo, ops...).Select()
+// OneGigachatmessage is a function that returns one Gigachatmessage by filters. It could return pg.ErrMultiRows.
+func (gr GigachatRepo) OneGigachatmessage(ctx context.Context, search *GigachatmessageSearch, ops ...OpFunc) (*Gigachatmessage, error) {
+	obj := &Gigachatmessage{}
+	err := buildQuery(ctx, gr.db, obj, search, gr.filters[Tables.Gigachatmessage.Name], PagerTwo, ops...).Select()
 
 	if errors.Is(err, pg.ErrMultiRows) {
 		return nil, err
@@ -79,31 +79,31 @@ func (gr GigachatRepo) OneGigachatMessage(ctx context.Context, search *GigachatM
 	return obj, err
 }
 
-// GigachatMessagesByFilters returns GigachatMessage list.
-func (gr GigachatRepo) GigachatMessagesByFilters(ctx context.Context, search *GigachatMessageSearch, pager Pager, ops ...OpFunc) (gigachatMessages []GigachatMessage, err error) {
-	err = buildQuery(ctx, gr.db, &gigachatMessages, search, gr.filters[Tables.GigachatMessage.Name], pager, ops...).Select()
+// GigachatmessagesByFilters returns Gigachatmessage list.
+func (gr GigachatRepo) GigachatmessagesByFilters(ctx context.Context, search *GigachatmessageSearch, pager Pager, ops ...OpFunc) (gigachatmessages []Gigachatmessage, err error) {
+	err = buildQuery(ctx, gr.db, &gigachatmessages, search, gr.filters[Tables.Gigachatmessage.Name], pager, ops...).Select()
 	return
 }
 
-// CountGigachatMessages returns count
-func (gr GigachatRepo) CountGigachatMessages(ctx context.Context, search *GigachatMessageSearch, ops ...OpFunc) (int, error) {
-	return buildQuery(ctx, gr.db, &GigachatMessage{}, search, gr.filters[Tables.GigachatMessage.Name], PagerOne, ops...).Count()
+// CountGigachatmessages returns count
+func (gr GigachatRepo) CountGigachatmessages(ctx context.Context, search *GigachatmessageSearch, ops ...OpFunc) (int, error) {
+	return buildQuery(ctx, gr.db, &Gigachatmessage{}, search, gr.filters[Tables.Gigachatmessage.Name], PagerOne, ops...).Count()
 }
 
-// AddGigachatMessage adds GigachatMessage to DB.
-func (gr GigachatRepo) AddGigachatMessage(ctx context.Context, gigachatMessage *GigachatMessage, ops ...OpFunc) (*GigachatMessage, error) {
-	q := gr.db.ModelContext(ctx, gigachatMessage)
+// AddGigachatmessage adds Gigachatmessage to DB.
+func (gr GigachatRepo) AddGigachatmessage(ctx context.Context, gigachatmessage *Gigachatmessage, ops ...OpFunc) (*Gigachatmessage, error) {
+	q := gr.db.ModelContext(ctx, gigachatmessage)
 	applyOps(q, ops...)
 	_, err := q.Insert()
 
-	return gigachatMessage, err
+	return gigachatmessage, err
 }
 
-// UpdateGigachatMessage updates GigachatMessage in DB.
-func (gr GigachatRepo) UpdateGigachatMessage(ctx context.Context, gigachatMessage *GigachatMessage, ops ...OpFunc) (bool, error) {
-	q := gr.db.ModelContext(ctx, gigachatMessage).WherePK()
+// UpdateGigachatmessage updates Gigachatmessage in DB.
+func (gr GigachatRepo) UpdateGigachatmessage(ctx context.Context, gigachatmessage *Gigachatmessage, ops ...OpFunc) (bool, error) {
+	q := gr.db.ModelContext(ctx, gigachatmessage).WherePK()
 	if len(ops) == 0 {
-		q = q.ExcludeColumn(Columns.GigachatMessage.ID)
+		q = q.ExcludeColumn(Columns.Gigachatmessage.ID)
 	}
 	applyOps(q, ops...)
 	res, err := q.Update()
@@ -114,11 +114,11 @@ func (gr GigachatRepo) UpdateGigachatMessage(ctx context.Context, gigachatMessag
 	return res.RowsAffected() > 0, err
 }
 
-// DeleteGigachatMessage deletes GigachatMessage from DB.
-func (gr GigachatRepo) DeleteGigachatMessage(ctx context.Context, id int) (deleted bool, err error) {
-	gigachatMessage := &GigachatMessage{ID: id}
+// DeleteGigachatmessage deletes Gigachatmessage from DB.
+func (gr GigachatRepo) DeleteGigachatmessage(ctx context.Context, id int) (deleted bool, err error) {
+	gigachatmessage := &Gigachatmessage{ID: id}
 
-	res, err := gr.db.ModelContext(ctx, gigachatMessage).WherePK().Delete()
+	res, err := gr.db.ModelContext(ctx, gigachatmessage).WherePK().Delete()
 	if err != nil {
 		return false, err
 	}

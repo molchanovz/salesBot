@@ -5,11 +5,11 @@
 package db
 
 var Columns = struct {
-	GigachatMessage struct {
+	Gigachatmessage struct {
 		ID, Message, Tgid string
 	}
 }{
-	GigachatMessage: struct {
+	Gigachatmessage: struct {
 		ID, Message, Tgid string
 	}{
 		ID:      "messageid",
@@ -19,20 +19,20 @@ var Columns = struct {
 }
 
 var Tables = struct {
-	GigachatMessage struct {
+	Gigachatmessage struct {
 		Name, Alias string
 	}
 }{
-	GigachatMessage: struct {
+	Gigachatmessage: struct {
 		Name, Alias string
 	}{
-		Name:  "gigachatMessages",
+		Name:  "gigachatmessages",
 		Alias: "t",
 	},
 }
 
-type GigachatMessage struct {
-	tableName struct{} `pg:"gigachatMessages,alias:t,discard_unknown_columns"`
+type Gigachatmessage struct {
+	tableName struct{} `pg:"gigachatmessages,alias:t,discard_unknown_columns"`
 
 	ID      int    `pg:"messageid,pk"`
 	Message string `pg:"message,use_zero"`

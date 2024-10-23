@@ -1,7 +1,7 @@
 <Package xmlns:xsi="" xmlns:xsd="">
     <Name>gigachat</Name>
     <Entities>
-        <Entity Name="GigachatMessage" Namespace="gigachat" Table="gigachatMessages">
+        <Entity Name="Gigachatmessage" Namespace="gigachat" Table="gigachatmessages">
             <Attributes>
                 <Attribute Name="ID" DBName="messageid" DBType="int4" GoType="int" PK="true" Nullable="Yes" Addable="true" Updatable="false" Min="0" Max="0"></Attribute>
                 <Attribute Name="Message" DBName="message" DBType="text" GoType="string" PK="false" Nullable="No" Addable="true" Updatable="true" Min="0" Max="0"></Attribute>
