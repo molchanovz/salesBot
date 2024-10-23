@@ -14,13 +14,14 @@ import (
 
 const (
 	somePattern               = "/some"
+	editMessagePattetn        = "/edit"
 	CallBackPatternAgreement  = "agree_"
 	CallBackPatternRefusement = "refuse_"
 )
 
 func (a *App) registerBotHandlers() {
 	a.b.RegisterHandler(bot.HandlerTypeMessageText, somePattern, bot.MatchTypePrefix, a.someHandler)
-	a.b.RegisterHandler(bot.HandlerTypeMessageText, somePattern, bot.MatchTypePrefix, a.editMessageHandler)
+	a.b.RegisterHandler(bot.HandlerTypeMessageText, editMessagePattetn, bot.MatchTypePrefix, a.editMessageHandler)
 	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternAgreement, bot.MatchTypePrefix, a.handleAgree)
 	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternRefusement, bot.MatchTypePrefix, a.handleRefuse)
 
