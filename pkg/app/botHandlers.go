@@ -39,6 +39,7 @@ func (a *App) someHandler(ctx context.Context, b *bot.Bot, update *models.Update
 	a.processGigachatAnswer(ctx, b, req, chatId)
 }
 
+// Handler с editMessagePattetn, редактирование сгенерированного сообщения
 func (a *App) editMessageHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	req := update.Message.Text
 	if req == "" {
@@ -75,6 +76,7 @@ func (a *App) editMessageHandler(ctx context.Context, b *bot.Bot, update *models
 	fmt.Printf("Инфо при отправке сообщения: %+v", info)
 }
 
+// Handler нажатия кнопки, соглашение с отправкой сгенерированного сообщения
 func (a *App) handleAgree(ctx context.Context, b *bot.Bot, update *models.Update) {
 	callBackData := update.CallbackQuery.Data[len(CallBackPatternAgreement):]
 	params, err := NewCallbackDataParams(callBackData)
@@ -107,8 +109,8 @@ func (a *App) handleAgree(ctx context.Context, b *bot.Bot, update *models.Update
 	fmt.Printf("Инфо: %+v", info)
 }
 
+// Handler нажатия кнопки, отказ от отправки сгенерированного сообщения
 func (a *App) handleRefuse(ctx context.Context, b *bot.Bot, update *models.Update) {
-	a.Logger.Printf("Кнопка отказа нажалась")
 	callBackData := update.CallbackQuery.Data[len(CallBackPatternRefusement):]
 	params, err := NewCallbackDataParams(callBackData)
 	if err != nil {
@@ -139,10 +141,16 @@ func (a *App) handleRefuse(ctx context.Context, b *bot.Bot, update *models.Updat
 
 }
 
-/*
-Функция обращения к API gigaChat
-*/
+// Функция обращения к API gigaChat
 func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string, chatId int) {
+
+	//Проверка есть ли сообщение от этого пользователя TODO
+	message, _ := a.sr.OneGigachatmessage(ctx, &db.GigachatmessageSearch{Tgid: &chatId})
+	if message != nil {
+		a.Logger.Errorf("От этого человека уже было сообщение, пропускаем")
+		return
+	}
+
 	str, err := a.g.SendRequest(text)
 	if err != nil {
 		a.Logger.Errorf("%v", err)
@@ -164,16 +172,9 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 	var buttons [][]models.InlineKeyboardButton
 	var agreementButtons []models.InlineKeyboardButton
 
-	//Проверка есть ли сообщение от этого пользователя
-	message, _ := a.sr.OneGigachatmessage(ctx, &db.GigachatmessageSearch{Tgid: &chatId})
-	if message != nil {
-		a.Logger.Errorf("От этого человека уже было сообщение, пропускаем")
-		return
-	}
-
 	//Добавление контакта в AmoCRM
-	nickName := strconv.Itoa(chatId) //TODO тут будет не chatId, а никнейм!
-	a.crm.AddContact(nickName, "89001234567", text)
+	nickName := "molchanovz" //TODO тут будет не chatId, а никнейм!
+	a.crm.AddContact(nickName, "89511562030", text)
 
 	//Добавление сообщения в БД
 	newMessage, err := a.sr.AddGigachatmessage(ctx, &db.Gigachatmessage{Message: generatedText, Tgid: &chatId})
