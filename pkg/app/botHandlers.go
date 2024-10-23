@@ -107,6 +107,7 @@ func (a *App) handleAgree(ctx context.Context, b *bot.Bot, update *models.Update
 }
 
 func (a *App) handleRefuse(ctx context.Context, b *bot.Bot, update *models.Update) {
+	a.Logger.Printf("Кнопка отказа нажалась")
 	callBackData := update.CallbackQuery.Data[len(CallBackPatternRefusement):]
 	params, err := NewCallbackDataParams(callBackData)
 	if err != nil {
