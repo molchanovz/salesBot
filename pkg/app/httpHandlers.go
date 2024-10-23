@@ -15,7 +15,7 @@ type WebhookMessage struct {
 	UserTGId    int64  `json:"usertgid"`
 	ChatTGId    int    `json:"chattgid"`
 
-	//TODO надо принимать номер телефона + ФИО
+	//TODO для Илюхи: надо принимать номер телефона + ФИО
 }
 
 func (a App) webhookHandler(w http.ResponseWriter, r *http.Request) {

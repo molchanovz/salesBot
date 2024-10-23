@@ -143,9 +143,6 @@ func (a *App) handleRefuse(ctx context.Context, b *bot.Bot, update *models.Updat
 Функция обращения к API gigaChat
 */
 func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string, chatId int) {
-
-	fmt.Println(chatId)
-
 	str, err := a.g.SendRequest(text)
 	if err != nil {
 		a.Logger.Errorf("%v", err)
@@ -167,18 +164,30 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 	var buttons [][]models.InlineKeyboardButton
 	var agreementButtons []models.InlineKeyboardButton
 
-	message, err := a.sr.AddGigachatmessage(ctx, &db.Gigachatmessage{Message: generatedText, Tgid: &chatId})
+	//Проверка есть ли сообщение от этого пользователя
+	message, _ := a.sr.OneGigachatmessage(ctx, &db.GigachatmessageSearch{Tgid: &chatId})
+	if message != nil {
+		a.Logger.Errorf("От этого человека уже было сообщение, пропускаем")
+		return
+	}
+
+	//Добавление контакта в AmoCRM
+	nickName := strconv.Itoa(chatId) //TODO тут будет не chatId, а никнейм!
+	a.crm.AddContact(nickName, "89001234567", text)
+
+	//Добавление сообщения в БД
+	newMessage, err := a.sr.AddGigachatmessage(ctx, &db.Gigachatmessage{Message: generatedText, Tgid: &chatId})
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
 	}
 
-	if message == nil {
+	if newMessage == nil {
 		a.Logger.Errorf("empty msg")
 		return
 	}
 
-	jsonParams := "{  \"messageId\": " + strconv.Itoa(message.ID) + ",\n  \"TgID\": " + strconv.Itoa(chatId) + "\n}"
+	jsonParams := "{  \"messageId\": " + strconv.Itoa(newMessage.ID) + ",\n  \"TgID\": " + strconv.Itoa(chatId) + "\n}"
 
 	agreementButtons = append(agreementButtons, models.InlineKeyboardButton{
 		Text: "Да", CallbackData: CallBackPatternAgreement + jsonParams},
@@ -203,8 +212,6 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 func (a App) sendWebhookResult(message WebhookMessage) {
 	ctx := context.Background()
 	if strings.Contains(strings.ToLower(message.Message), "двер") {
-		nickName := strconv.Itoa(message.ChatTGId) //TODO тут будет не чат айди, а никнейм!
-		a.crm.AddContact(nickName, "89001234567", message.Message)
 		a.processGigachatAnswer(ctx, a.b, message.Message, message.ChatTGId)
 	}
 }
