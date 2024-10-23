@@ -131,19 +131,19 @@ func (crm AmoCRM) GetLead(token string, id int) string {
 /*
 Добавление одного контакта в AmoCRM
 */
-func (crm AmoCRM) AddContact(token string) string {
+func (crm AmoCRM) AddContact(nickName, number, request string) string {
 
-	telephoneNumValue := Value{Value: "88005553535", EnumId: 273245, EnumCode: "WORK"}
+	telephoneNumValue := Value{Value: number, EnumId: 273245, EnumCode: "WORK"}
 	telephoneNumValues := Values{telephoneNumValue}
 
-	telegramNicknameValue := Value{Value: "@molchanovz"}
+	telegramNicknameValue := Value{Value: "t.me/" + nickName}
 	telegramNicknameValues := Values{telegramNicknameValue}
 
-	telegramRequestValue := Value{Value: "У меня сломалась дверь, знает кто-нибудь хороших специалистов?"}
+	telegramRequestValue := Value{Value: request}
 	telegramRequestValues := Values{telegramRequestValue}
 
 	telephoneNumField := CustomFieldsValue{Values: telephoneNumValues, FieldName: "Телефон", FieldId: 312455, FieldCode: "PHONE"}
-	telegramNicknameField := CustomFieldsValue{Values: telegramNicknameValues, FieldName: "Ник телеграм", FieldId: 337421}
+	telegramNicknameField := CustomFieldsValue{Values: telegramNicknameValues, FieldName: "Ссылка на телеграм", FieldId: 387109}
 	telegramRequestField := CustomFieldsValue{Values: telegramRequestValues, FieldName: "Запрос", FieldId: 338825}
 
 	customFieldsValues := CustomFieldsValues{telephoneNumField, telegramNicknameField, telegramRequestField}
@@ -162,7 +162,7 @@ func (crm AmoCRM) AddContact(token string) string {
 		log.Fatalf("Ошибка создания запроса: %v", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Authorization", "Bearer "+crm.Token)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

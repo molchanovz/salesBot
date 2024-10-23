@@ -203,9 +203,8 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 func (a App) sendWebhookResult(message WebhookMessage) {
 	ctx := context.Background()
 	if strings.Contains(strings.ToLower(message.Message), "двер") {
-
-		// TODO принимать информацию контакта для a.crm.AddContact()
-
+		nickName := strconv.Itoa(message.ChatTGId) //TODO тут будет не чат айди, а никнейм!
+		a.crm.AddContact(nickName, "89001234567", message.Message)
 		a.processGigachatAnswer(ctx, a.b, message.Message, message.ChatTGId)
 	}
 }

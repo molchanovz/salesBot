@@ -14,6 +14,8 @@ type WebhookMessage struct {
 	Message     string `json:"message"`
 	UserTGId    int64  `json:"usertgid"`
 	ChatTGId    int    `json:"chattgid"`
+
+	//TODO надо принимать номер телефона + ФИО
 }
 
 func (a App) webhookHandler(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +58,6 @@ func (a App) webhookHandler(w http.ResponseWriter, r *http.Request) {
 
 func (a App) registerHttpHandlers() error {
 	http.HandleFunc("/webhook", a.webhookHandler)
-
 	a.Logger.Printf("http run")
 	return http.ListenAndServe(":8055", nil)
 }
