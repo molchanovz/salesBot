@@ -55,7 +55,7 @@ type GigachatmessageSearch struct {
 
 	ID           *int
 	Message      *string
-	Tgid         *int
+	Tgid         *int64
 	IDs          []int
 	MessageILike *string
 }

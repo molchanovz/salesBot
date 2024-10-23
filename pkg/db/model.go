@@ -36,5 +36,5 @@ type Gigachatmessage struct {
 
 	ID      int    `pg:"messageid,pk"`
 	Message string `pg:"message,use_zero"`
-	Tgid    *int   `pg:"tgid"`
+	Tgid    *int64 `pg:"tgid"`
 }

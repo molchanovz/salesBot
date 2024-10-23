@@ -28,7 +28,7 @@ func (a *App) registerBotHandlers() {
 }
 
 func (a *App) someHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
-	chatId := int(update.Message.From.ID)
+	chatId := update.Message.From.ID
 
 	req := update.Message.Text[len(somePattern)+1:]
 	if req == "" {
@@ -67,7 +67,7 @@ func (a *App) editMessageHandler(ctx context.Context, b *bot.Bot, update *models
 		return
 	}
 
-	info, err := c.Sales.SendTextMessageByTgChatID(ctx, *message.Tgid, request)
+	info, err := c.Sales.SendTextMessageByTgChatID(ctx, int(*message.Tgid), request)
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
@@ -142,7 +142,7 @@ func (a *App) handleRefuse(ctx context.Context, b *bot.Bot, update *models.Updat
 }
 
 // Функция обращения к API gigaChat
-func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string, chatId int) {
+func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string, chatId int64) {
 
 	//Проверка есть ли сообщение от этого пользователя TODO
 	message, _ := a.sr.OneGigachatmessage(ctx, &db.GigachatmessageSearch{Tgid: &chatId})
@@ -188,7 +188,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 		return
 	}
 
-	jsonParams := "{  \"messageId\": " + strconv.Itoa(newMessage.ID) + ",\n  \"TgID\": " + strconv.Itoa(chatId) + "\n}"
+	jsonParams := "{  \"messageId\": " + strconv.Itoa(newMessage.ID) + ",\n  \"TgID\": " + strconv.Itoa(int(chatId)) + "\n}"
 
 	agreementButtons = append(agreementButtons, models.InlineKeyboardButton{
 		Text: "Да", CallbackData: CallBackPatternAgreement + jsonParams},
@@ -213,7 +213,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 func (a App) sendWebhookResult(message WebhookMessage) {
 	ctx := context.Background()
 	if strings.Contains(strings.ToLower(message.Message), "двер") {
-		a.processGigachatAnswer(ctx, a.b, message.Message, message.ChatTGId)
+		a.processGigachatAnswer(ctx, a.b, message.Message, int64(message.ChatTGId))
 	}
 }
 
@@ -231,4 +231,8 @@ func NewCallbackDataParams(s string) (CallbackDataParams, error) {
 func (b CallbackDataParams) String() (string, error) {
 	s, err := json.Marshal(b)
 	return string(s), err
+}
+
+func pointer[T any](in T) *T {
+	return &in
 }
