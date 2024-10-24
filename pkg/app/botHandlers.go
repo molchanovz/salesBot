@@ -67,7 +67,7 @@ func (a *App) editMessageHandler(ctx context.Context, b *bot.Bot, update *models
 		return
 	}
 
-	info, err := c.Sales.SendTextMessageByTgChatID(ctx, int(*message.Tgid), request)
+	info, err := c.Sales.SendTextMessageByTgChatID(ctx, int(*message.Tgid), request, pointer(false))
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
@@ -100,7 +100,7 @@ func (a *App) handleAgree(ctx context.Context, b *bot.Bot, update *models.Update
 		return
 	}
 
-	info, err := c.Sales.SendTextMessageByTgChatID(ctx, params.TgID, message.Message)
+	info, err := c.Sales.SendTextMessageByTgChatID(ctx, params.TgID, message.Message, pointer(false))
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return

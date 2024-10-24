@@ -1,4 +1,5 @@
 // Code generated from jsonrpc schema by rpcgen v2.4.4; DO NOT EDIT.
+
 package sales
 
 import (
@@ -507,12 +508,13 @@ var (
 )
 
 // SendTextMessageByTgChatId отправляем текстовое сообщение в чат с id = chatId (имеется в виду tgId чата)
-func (c *svcSales) SendTextMessageByTgChatID(ctx context.Context, chatId int, message string) (res *Response, err error) {
+func (c *svcSales) SendTextMessageByTgChatID(ctx context.Context, chatId int, message string, requireChat *bool) (res *Response, err error) {
 	_req := struct {
-		ChatID  int
-		Message string
+		ChatID      int
+		Message     string
+		RequireChat *bool
 	}{
-		ChatID: chatId, Message: message,
+		ChatID: chatId, Message: message, RequireChat: requireChat,
 	}
 
 	err = c.client.call(ctx, "sales.SendTextMessageByTgChatId", _req, &res)
