@@ -92,7 +92,7 @@ func (crm AmoCRM) GetContact(token string, id int) string {
 /*
 Получение одной сделки в AmoCRM
 */
-func (crm AmoCRM) GetLead(token string, id int) string {
+func (crm AmoCRM) GetLead(token string, id int) []byte {
 
 	url := "https://molchanovtop.amocrm.ru/api/v4/leads/" + strconv.Itoa(id) + "?with=contacts"
 
@@ -120,12 +120,12 @@ func (crm AmoCRM) GetLead(token string, id int) string {
 	if resp.StatusCode != http.StatusOK {
 		log.Printf("Ошибка: получен статус %s", resp.Status)
 		log.Printf("Тело ответа: %s", string(responseBody))
-		return string(responseBody) // Возвращаем тело для отладки
+		return responseBody // Возвращаем тело для отладки
 	}
 
 	fmt.Println(resp.Status)
 
-	return string(responseBody)
+	return responseBody
 }
 
 /*

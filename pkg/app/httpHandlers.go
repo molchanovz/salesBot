@@ -1,10 +1,12 @@
 package app
 
 import (
+	"apisrv/pkg/amoCRM"
 	"encoding/json"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"strconv"
 )
 
 // WebhookMessage структура для хранения данных вебхука
@@ -65,9 +67,17 @@ func (a App) webhookAmoCRMHandler(c echo.Context) error {
 		return echo.ErrMethodNotAllowed
 	}
 
-	leadId := c.Request().Form["leads[add][0][id]"]
+	leadId, _ := strconv.Atoi(c.Request().Form.Get("leads[add][0][id]"))
 
-	a.Logger.Printf("Айди лида: %v", leadId)
+	leadString := a.crm.GetLead(a.crm.Token, leadId)
+
+	var lead amoCRM.Lead
+
+	json.Unmarshal(leadString, &lead)
+
+	contactId := lead.Embedded.Contacts[0].Id
+
+	a.Logger.Printf("Наш контакт айди: %v", contactId)
 	return nil
 
 }
