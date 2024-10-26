@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"net/http"
 )
 
 // WebhookMessage структура для хранения данных вебхука
@@ -79,22 +80,26 @@ type Lead struct {
 func (a App) webhookAmoCRMHandler(c echo.Context) error {
 
 	r := c.Request()
-	var l Lead
 
 	params, err := c.FormParams()
-	a.Logger.Printf("Form values %+v %v", params.Get("leads"), err)
-	a.Logger.Printf("Req form %d %+v", len(c.Request().Form), c.Request().Form.Get("leads"))
-	a.Logger.Printf("Req postform %d %+v", len(c.Request().PostForm), c.Request().PostForm.Get("leads"))
+	a.Logger.Printf("Form values %v %v", params, err)
+	a.Logger.Printf("Req form %d %v", len(c.Request().Form), c.Request().Form)
+	a.Logger.Printf("Req postform %d %v", len(c.Request().PostForm), c.Request().PostForm)
 
 	a.Logger.Printf("webhook gained from amoCrm %+v", c.FormValue("leads"))
 	if r.Method != "POST" {
 		return echo.ErrMethodNotAllowed
 	}
 
-	err = json.Unmarshal([]byte(c.FormValue("leads")), &l)
-	if err != nil {
-		return err
+	l := new(Lead)
+	if err := c.Bind(l); err != nil {
+		return c.String(http.StatusBadRequest, "bad lead binding")
 	}
+
+	//err = json.Unmarshal([]byte(c.FormValue("leads")), &l)
+	//if err != nil {
+	//	return err
+	//}
 
 	a.Logger.Printf("Айди лида: %v", l.Add[0].ID)
 	return nil
