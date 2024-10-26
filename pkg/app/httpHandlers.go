@@ -8,14 +8,14 @@ import (
 
 // WebhookMessage структура для хранения данных вебхука
 type WebhookMessage struct {
-	Description string `json:"description"`
-	Event       string `json:"event"`
-	MessageType string `json:"messagetype"`
-	Message     string `json:"message"`
-	UserTGId    int64  `json:"usertgid"`
-	ChatTGId    int    `json:"chattgid"`
-
-	//TODO для Илюхи: надо принимать номер телефона + ФИО + телеграм ник
+	Description string  `json:"description"`
+	Event       string  `json:"event"`
+	MessageType string  `json:"messagetype"`
+	Message     string  `json:"message"`
+	UserTGId    int64   `json:"usertgid"`
+	ChatTGId    int     `json:"chattgid"`
+	SenderTgId  *int64  `json:"senderTgId"`
+	Nickname    *string `json:"nickname"`
 }
 
 func (a App) webhookHandler(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +44,12 @@ func (a App) webhookHandler(w http.ResponseWriter, r *http.Request) {
 		a.Logger.Printf("\tMessage: %s\n", message.Message)
 		a.Logger.Printf("\tUserTGID: %d\n", message.UserTGId)
 		a.Logger.Printf("\tChatTGID: %d\n", message.ChatTGId)
-
+		if message.SenderTgId != nil {
+			a.Logger.Printf("\tSenderTGID: %d\n", *message.SenderTgId)
+		}
+		if message.Nickname != nil {
+			a.Logger.Printf("\tNickname: %d\n", *message.Nickname)
+		}
 		// Отправляем ответ об успешной обработке вебхука
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`{"status": "ok"}`))
