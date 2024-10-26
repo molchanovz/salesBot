@@ -81,12 +81,12 @@ func (a App) webhookAmoCRMHandler(c echo.Context) error {
 	r := c.Request()
 	var l Lead
 
-	a.Logger.Printf("webhook gained from amoCrm %s", r.Form.Get("leads"))
+	a.Logger.Printf("webhook gained from amoCrm %s", c.FormValue("leads"))
 	if r.Method != "POST" {
 		return echo.ErrMethodNotAllowed
 	}
 
-	err := json.Unmarshal([]byte(r.Form.Get("leads")), &l)
+	err := json.Unmarshal([]byte(c.FormValue("leads")), &l)
 	if err != nil {
 		return err
 	}
