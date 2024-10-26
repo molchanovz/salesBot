@@ -49,12 +49,12 @@ mod:
 	@go mod vendor
 	@git add vendor
 
-NS := "NONE"
+NS := "common"
 
-MAPPING := "salesbot:salesbot.gigachatmessages"
+MAPPING := "salesbot:studup.gigachatmessages"
 
 mfd-xml:
-	@mfd-generator xml -c "postgres://postgres:postgres@localhost:5432/apisrv?sslmode=disable" -m ./docs/model/salesBot.mfd -n $(MAPPING)
+	@mfd-generator xml -c "postgres://postgres:Kvashok2002@localhost:5432/salesbot?sslmode=disable" -m ./docs/model/salesBot.mfd -n $(MAPPING)
 mfd-model:
 	@mfd-generator model -m ./docs/model/salesBot.mfd -p db -o ./pkg/db
 mfd-repo: --check-ns
