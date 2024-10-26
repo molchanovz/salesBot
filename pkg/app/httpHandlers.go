@@ -83,7 +83,7 @@ func (a App) webhookAmoCRMHandler(c echo.Context) error {
 
 	params, err := c.FormParams()
 	a.Logger.Printf("Form values %v %v", params, err)
-	a.Logger.Printf("Req form %d %v", len(c.Request().Form), c.Request().Form)
+	a.Logger.Printf("Req form %d %v %v %v %v %v", len(c.Request().Form), c.Request().Form["leads"], c.Request().Form["add"], c.Request().Form["leads[add]"], c.Request().Form["leads[add][0]"], c.Request().Form["leads[add][0][id]"])
 	a.Logger.Printf("Req postform %d %v", len(c.Request().PostForm), c.Request().PostForm)
 
 	a.Logger.Printf("webhook gained from amoCrm %+v", c.FormValue("leads"))
