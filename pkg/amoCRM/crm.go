@@ -182,6 +182,49 @@ func (crm AmoCRM) AddContact(nickName, number, request string) string {
 	return fmt.Sprintf("Статус запроса: %+v ", resp.Status)
 }
 
+func (crm AmoCRM) EditContact(contactId int, request string) string {
+
+	telegramRequestValue := Value{Value: request}
+	telegramRequestValues := Values{telegramRequestValue}
+
+	telegramRequestField := CustomFieldsValue{Values: telegramRequestValues, FieldName: "Запрос", FieldId: 338825}
+
+	customFieldsValues := CustomFieldsValues{telegramRequestField}
+	contacts := Contacts{Contact{Id: contactId, CustomFieldsValues: customFieldsValues}}
+
+	url := "https://molchanovtop.amocrm.ru/api/v4/contacts"
+
+	body, err := json.Marshal(contacts)
+	if err != nil {
+		log.Fatalf("Ошибка чтения структуры Сделка: %v", err)
+	}
+
+	req, err := http.NewRequest("PATCH", url, bytes.NewBuffer(body))
+
+	if err != nil {
+		log.Fatalf("Ошибка создания запроса: %v", err)
+	}
+
+	req.Header.Set("Authorization", "Bearer "+crm.Token)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalf("Ошибка выполнения запроса: %v", err)
+	}
+	defer resp.Body.Close()
+
+	responseBody, _ := io.ReadAll(resp.Body)
+
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("Ошибка: получен статус %s", resp.Status)
+		log.Printf("Тело ответа: %s", string(responseBody))
+		return string(responseBody)
+	}
+
+	return fmt.Sprintf("Статус запроса: %+v ", resp.Status)
+}
+
 /*
 Добавление одной сделки в AmoCRM
 */

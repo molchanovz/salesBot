@@ -56,8 +56,10 @@ type GigachatmessageSearch struct {
 	ID           *int
 	Message      *string
 	Tgid         *int64
+	Request      *string
 	IDs          []int
 	MessageILike *string
+	RequestILike *string
 }
 
 func (gs *GigachatmessageSearch) Apply(query *orm.Query) *orm.Query {
@@ -73,11 +75,17 @@ func (gs *GigachatmessageSearch) Apply(query *orm.Query) *orm.Query {
 	if gs.Tgid != nil {
 		gs.where(query, Tables.Gigachatmessage.Alias, Columns.Gigachatmessage.Tgid, gs.Tgid)
 	}
+	if gs.Request != nil {
+		gs.where(query, Tables.Gigachatmessage.Alias, Columns.Gigachatmessage.Request, gs.Request)
+	}
 	if len(gs.IDs) > 0 {
 		Filter{Columns.Gigachatmessage.ID, gs.IDs, SearchTypeArray, false}.Apply(query)
 	}
 	if gs.MessageILike != nil {
 		Filter{Columns.Gigachatmessage.Message, *gs.MessageILike, SearchTypeILike, false}.Apply(query)
+	}
+	if gs.RequestILike != nil {
+		Filter{Columns.Gigachatmessage.Request, *gs.RequestILike, SearchTypeILike, false}.Apply(query)
 	}
 
 	gs.apply(query)

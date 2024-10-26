@@ -6,15 +6,16 @@ package db
 
 var Columns = struct {
 	Gigachatmessage struct {
-		ID, Message, Tgid string
+		ID, Message, Tgid, Request string
 	}
 }{
 	Gigachatmessage: struct {
-		ID, Message, Tgid string
+		ID, Message, Tgid, Request string
 	}{
 		ID:      "messageid",
 		Message: "message",
 		Tgid:    "tgid",
+		Request: "request",
 	},
 }
 
@@ -37,4 +38,5 @@ type Gigachatmessage struct {
 	ID      int    `pg:"messageid,pk"`
 	Message string `pg:"message,use_zero"`
 	Tgid    *int64 `pg:"tgid"`
+	Request string `pg:"request,use_zero"`
 }

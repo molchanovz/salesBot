@@ -2,6 +2,8 @@ package app
 
 import (
 	"apisrv/pkg/amoCRM"
+	"apisrv/pkg/db"
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/labstack/echo/v4"
@@ -76,8 +78,27 @@ func (a App) webhookAmoCRMHandler(c echo.Context) error {
 	json.Unmarshal(leadString, &lead)
 
 	contactId := lead.Embedded.Contacts[0].Id
+	var tgId int64
+	var err error
+	for i := range lead.Embedded.Contacts[0].CustomFieldsValues {
+		if lead.Embedded.Contacts[0].CustomFieldsValues[i].FieldId == 396043 {
+			value := lead.Embedded.Contacts[0].CustomFieldsValues[i].Values[0].Value
+			tgId, err = strconv.ParseInt(value, 10, 64)
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
 
 	a.Logger.Printf("Наш контакт айди: %v", contactId)
+	a.Logger.Printf("Наш тг айди: %v", tgId)
+
+	ctx := context.Background()
+	var message []db.Gigachatmessage
+	message, _ = a.sr.GigachatmessagesByFilters(ctx, &db.GigachatmessageSearch{Tgid: &tgId}, db.PagerOne)
+
+	a.crm.EditContact(contactId, strconv.FormatInt(*message[0].Tgid, 10))
+
 	return nil
 
 }

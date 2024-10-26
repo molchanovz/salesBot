@@ -159,12 +159,8 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 	var buttons [][]models.InlineKeyboardButton
 	var agreementButtons []models.InlineKeyboardButton
 
-	////Добавление контакта в AmoCRM
-	//nickName := "molchanovz" //TODO тут будет не chatId, а никнейм!
-	//a.crm.AddContact(nickName, "89511562030", text)
-
 	//Добавление сообщения в БД
-	newMessage, err := a.sr.AddGigachatmessage(ctx, &db.Gigachatmessage{Message: generatedText, Tgid: &chatId})
+	newMessage, err := a.sr.AddGigachatmessage(ctx, &db.Gigachatmessage{Message: generatedText, Tgid: &chatId, Request: text})
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 		return
