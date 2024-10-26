@@ -14,32 +14,19 @@ import (
 
 const (
 	somePattern               = "/some"
-	editMessagePattetn        = "/edit"
+	editMessagePattern        = "/edit"
 	CallBackPatternAgreement  = "agree_"
 	CallBackPatternRefusement = "refuse_"
 )
 
 func (a *App) registerBotHandlers() {
-	a.b.RegisterHandler(bot.HandlerTypeMessageText, somePattern, bot.MatchTypePrefix, a.someHandler)
-	a.b.RegisterHandler(bot.HandlerTypeMessageText, editMessagePattetn, bot.MatchTypePrefix, a.editMessageHandler)
+	a.b.RegisterHandler(bot.HandlerTypeMessageText, editMessagePattern, bot.MatchTypePrefix, a.editMessageHandler)
 	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternAgreement, bot.MatchTypePrefix, a.handleAgree)
 	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternRefusement, bot.MatchTypePrefix, a.handleRefuse)
 
 }
 
-func (a *App) someHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
-	chatId := update.Message.From.ID
-
-	req := update.Message.Text[len(somePattern)+1:]
-	if req == "" {
-		a.Logger.Errorf("Запрос пустой")
-		return
-	}
-
-	a.processGigachatAnswer(ctx, b, req, chatId)
-}
-
-// Handler с editMessagePattetn, редактирование сгенерированного сообщения
+// Handler с editMessagePattern, редактирование сгенерированного сообщения
 func (a *App) editMessageHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	req := update.Message.Text
 	if req == "" {
@@ -172,9 +159,9 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 	var buttons [][]models.InlineKeyboardButton
 	var agreementButtons []models.InlineKeyboardButton
 
-	//Добавление контакта в AmoCRM
-	nickName := "molchanovz" //TODO тут будет не chatId, а никнейм!
-	a.crm.AddContact(nickName, "89511562030", text)
+	////Добавление контакта в AmoCRM
+	//nickName := "molchanovz" //TODO тут будет не chatId, а никнейм!
+	//a.crm.AddContact(nickName, "89511562030", text)
 
 	//Добавление сообщения в БД
 	newMessage, err := a.sr.AddGigachatmessage(ctx, &db.Gigachatmessage{Message: generatedText, Tgid: &chatId})
