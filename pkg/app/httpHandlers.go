@@ -81,12 +81,17 @@ func (a App) webhookAmoCRMHandler(c echo.Context) error {
 	r := c.Request()
 	var l Lead
 
-	a.Logger.Printf("webhook gained from amoCrm %s", c.FormValue("leads"))
+	params, err := c.FormParams()
+	a.Logger.Printf("Form values %+v %v", params, err)
+	a.Logger.Printf("Req form %d %+v", len(c.Request().Form), c.Request().Form)
+	a.Logger.Printf("Req postform %d %+v", len(c.Request().PostForm), c.Request().PostForm)
+
+	a.Logger.Printf("webhook gained from amoCrm %v", c.FormValue("leads"))
 	if r.Method != "POST" {
 		return echo.ErrMethodNotAllowed
 	}
 
-	err := json.Unmarshal([]byte(c.FormValue("leads")), &l)
+	err = json.Unmarshal([]byte(c.FormValue("leads")), &l)
 	if err != nil {
 		return err
 	}
