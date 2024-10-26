@@ -58,14 +58,40 @@ func (a App) webhookHandler(c echo.Context) error {
 	return nil
 }
 
+type Lead struct {
+	Add []struct {
+		ID                string `json:"id"`
+		Name              string `json:"name"`
+		StatusID          string `json:"status_id"`
+		Price             string `json:"price"`
+		ResponsibleUserID string `json:"responsible_user_id"`
+		LastModified      string `json:"last_modified"`
+		ModifiedUserID    string `json:"modified_user_id"`
+		CreatedUserID     string `json:"created_user_id"`
+		DateCreate        string `json:"date_create"`
+		PipelineID        string `json:"pipeline_id"`
+		AccountID         string `json:"account_id"`
+		CreatedAt         string `json:"created_at"`
+		UpdatedAt         string `json:"updated_at"`
+	} `json:"add"`
+}
+
 func (a App) webhookAmoCRMHandler(c echo.Context) error {
 
 	r := c.Request()
+	var l Lead
 
-	a.Logger.Printf("webhook gained from amoCrm %s", r.Body)
+	a.Logger.Printf("webhook gained from amoCrm %s", r.Form.Get("leads"))
 	if r.Method != "POST" {
 		return echo.ErrMethodNotAllowed
 	}
+
+	err := json.Unmarshal([]byte(r.Form.Get("leads")), &l)
+	if err != nil {
+		return err
+	}
+
+	a.Logger.Printf("Айди лида: %v", l.Add[0].ID)
 	return nil
 	//var message WebhookMessage
 	//decoder := json.NewDecoder(r.Body)
