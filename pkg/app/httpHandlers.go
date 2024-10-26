@@ -82,11 +82,11 @@ func (a App) webhookAmoCRMHandler(c echo.Context) error {
 	var l Lead
 
 	params, err := c.FormParams()
-	a.Logger.Printf("Form values %+v %v", params, err)
-	a.Logger.Printf("Req form %d %+v", len(c.Request().Form), c.Request().Form)
-	a.Logger.Printf("Req postform %d %+v", len(c.Request().PostForm), c.Request().PostForm)
+	a.Logger.Printf("Form values %+v %v", params.Get("leads"), err)
+	a.Logger.Printf("Req form %d %+v", len(c.Request().Form), c.Request().Form.Get("leads"))
+	a.Logger.Printf("Req postform %d %+v", len(c.Request().PostForm), c.Request().PostForm.Get("leads"))
 
-	a.Logger.Printf("webhook gained from amoCrm %v", c.FormValue("leads"))
+	a.Logger.Printf("webhook gained from amoCrm %+v", c.FormValue("leads"))
 	if r.Method != "POST" {
 		return echo.ErrMethodNotAllowed
 	}
