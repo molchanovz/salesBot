@@ -57,7 +57,7 @@ func (a App) webhookHandler(w http.ResponseWriter, r *http.Request) {
 }
 func (a App) webhookAmoCRMHandler(w http.ResponseWriter, r *http.Request) {
 
-	println("webhook gained from amoCrm", r.Method)
+	a.Logger.Printf("webhook gained from amoCrm", r.Method)
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
