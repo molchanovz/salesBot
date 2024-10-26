@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"net/http"
 )
 
 // WebhookMessage структура для хранения данных вебхука
@@ -59,77 +58,17 @@ func (a App) webhookHandler(c echo.Context) error {
 	return nil
 }
 
-type Lead struct {
-	Add []struct {
-		ID                string `json:"id"`
-		Name              string `json:"name"`
-		StatusID          string `json:"status_id"`
-		Price             string `json:"price"`
-		ResponsibleUserID string `json:"responsible_user_id"`
-		LastModified      string `json:"last_modified"`
-		ModifiedUserID    string `json:"modified_user_id"`
-		CreatedUserID     string `json:"created_user_id"`
-		DateCreate        string `json:"date_create"`
-		PipelineID        string `json:"pipeline_id"`
-		AccountID         string `json:"account_id"`
-		CreatedAt         string `json:"created_at"`
-		UpdatedAt         string `json:"updated_at"`
-	} `json:"add"`
-}
-
 func (a App) webhookAmoCRMHandler(c echo.Context) error {
-
 	r := c.Request()
-
-	params, err := c.FormParams()
-	a.Logger.Printf("Form values %v %v", params, err)
-	a.Logger.Printf("Req form %d %v %v %v %v %v", len(c.Request().Form), c.Request().Form["leads"], c.Request().Form["add"], c.Request().Form["leads[add]"], c.Request().Form["leads[add][0]"], c.Request().Form["leads[add][0][id]"])
-	a.Logger.Printf("Req postform %d %v", len(c.Request().PostForm), c.Request().PostForm)
-
 	a.Logger.Printf("webhook gained from amoCrm %+v", c.FormValue("leads"))
 	if r.Method != "POST" {
 		return echo.ErrMethodNotAllowed
 	}
 
-	l := new(Lead)
-	if err := c.Bind(l); err != nil {
-		return c.String(http.StatusBadRequest, "bad lead binding")
-	}
+	leadId := c.Request().Form["leads[add][0][id]"]
 
-	//err = json.Unmarshal([]byte(c.FormValue("leads")), &l)
-	//if err != nil {
-	//	return err
-	//}
-
-	a.Logger.Printf("Айди лида: %v", l.Add[0].ID)
+	a.Logger.Printf("Айди лида: %v", leadId)
 	return nil
-	//var message WebhookMessage
-	//decoder := json.NewDecoder(r.Body)
-	//err := decoder.Decode(&message)
-	//defer r.Body.Close()
-	//if err != nil {
-	//	http.Error(w, fmt.Sprintf("Failed to decode request body: %v", err), http.StatusBadRequest)
-	//	return
-	//}
-	//
-	//if message.Event == "new_msg" {
-	//	// Обрабатываем сообщение
-	//	a.Logger.Printf("Received webhook:")
-	//	a.Logger.Printf("\tDescription: %s\n", message.Description)
-	//	a.Logger.Printf("\tEvent: %s\n", message.Event)
-	//	a.Logger.Printf("\tMessagetype: %s\n", message.MessageType)
-	//	a.Logger.Printf("\tMessage: %s\n", message.Message)
-	//	a.Logger.Printf("\tUserTGID: %d\n", message.UserTGId)
-	//	a.Logger.Printf("\tChatTGID: %d\n", message.ChatTGId)
-	//
-	//	// Отправляем ответ об успешной обработке вебхука
-	//	w.WriteHeader(http.StatusOK)
-	//	_, _ = w.Write([]byte(`{"status": "ok"}`))
-	//
-	//	a.sendWebhookResult(message)
-	//} else {
-	//	a.Logger.Printf("Ивент вебхука: %s", message.Event)
-	//}
 
 }
 
