@@ -102,5 +102,5 @@ func (a App) registerHttpHandlers() error {
 	http.HandleFunc("/webhook", a.webhookHandler)
 	http.HandleFunc("/webhook/amocrm", a.webhookAmoCRMHandler)
 	a.Logger.Printf("http run")
-	return http.ListenAndServe(":8055", nil)
+	return http.ListenAndServe("0.0.0.0:8055", nil)
 }
