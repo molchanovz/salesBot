@@ -200,7 +200,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 func (a App) sendWebhookResult(message WebhookMessage) {
 	ctx := context.Background()
 	if strings.Contains(strings.ToLower(message.Message), "двер") {
-		a.processGigachatAnswer(ctx, a.b, message.Message, int64(message.ChatTGId))
+		a.processGigachatAnswer(ctx, a.b, message.Message, *message.SenderTgId)
 	}
 }
 
