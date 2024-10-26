@@ -48,7 +48,7 @@ func (a App) webhookHandler(w http.ResponseWriter, r *http.Request) {
 			a.Logger.Printf("\tSenderTGID: %d\n", *message.SenderTgId)
 		}
 		if message.Nickname != nil {
-			a.Logger.Printf("\tNickname: %d\n", *message.Nickname)
+			a.Logger.Printf("\tNickname: %s\n", *message.Nickname)
 		}
 		// Отправляем ответ об успешной обработке вебхука
 		w.WriteHeader(http.StatusOK)
