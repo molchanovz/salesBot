@@ -62,7 +62,7 @@ func (a App) webhookAmoCRMHandler(c echo.Context) error {
 
 	r := c.Request()
 
-	a.Logger.Printf("webhook gained from amoCrm %s", r.Method)
+	a.Logger.Printf("webhook gained from amoCrm %s", r.Body)
 	if r.Method != "POST" {
 		return echo.ErrMethodNotAllowed
 	}
