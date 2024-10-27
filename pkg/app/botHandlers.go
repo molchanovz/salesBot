@@ -229,7 +229,6 @@ func (a App) sendWebhookResult(message WebhookMessage) {
 }
 
 func eligibleForms(in string) bool {
-	fmt.Println(strings.Split(forms, ","))
 	for _, form := range strings.Split(forms, ",") {
 		if strings.Contains(in, form) {
 			return true
