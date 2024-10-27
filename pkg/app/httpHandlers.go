@@ -107,7 +107,7 @@ func (a App) webhookAmoCRMHandler(c echo.Context) error {
 	var message []db.Gigachatmessage
 	message, _ = a.sr.GigachatmessagesByFilters(ctx, &db.GigachatmessageSearch{Tgid: &tgId}, db.PagerOne)
 
-	a.crm.EditContact(contactId, strconv.FormatInt(*message[0].Tgid, 10))
+	a.crm.EditContact(contactId, message[0].Request)
 
 	return nil
 
