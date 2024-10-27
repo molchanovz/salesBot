@@ -88,12 +88,10 @@ func (a App) webhookAmoCRMHandler(c echo.Context) error {
 
 	a.Logger.Printf("contactId: %v\n", contactId)
 
-	a.Logger.Printf("Contact info: %v", lead.Embedded.Contacts[0])
-
 	var tgId int64
 
 	var contact amoCRM.Contact
-	err = json.Unmarshal(a.crm.GetContact(a.crm.Token, leadId), &contact)
+	err = json.Unmarshal(a.crm.GetContact(a.crm.Token, contactId), &contact)
 	if err != nil {
 		return err
 	}
