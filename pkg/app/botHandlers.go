@@ -137,23 +137,50 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 		return
 	}
 
-	str, err := a.g.SendRequest(text)
+	yesNoPrompt := "Наша компания продаёт двери. \n\nМожно ли человеку предлагать купить дверь если он написал такое сообщение? Мы должны предлагать купить дверь, только если видим в запросе явную нужду в покупке/замене двери. Если из контекста кажется, что дверь можно предложить, но в сообщении явно не написано о желании купить/заменить дверь, то отвечай нет. В сообщении должно быть явно указано, что речь идет об обновлении, замене или покупке чего-то, связанного с дверями. В ответ напиши одно слово, \"да\" либо \"нет\" без точек на конце.\nВот сообщение:\n"
+
+	resp, err := a.g.SendRequest(yesNoPrompt + text)
 	if err != nil {
 		a.Logger.Errorf("%v", err)
 	}
 
+	if len(resp.Choices) < 1 {
+		a.Logger.Errorf("Пустой ответ: %+v\nЗапрос:\n%s", resp.Choices, text)
+		return
+	}
+
+	switch resp.Choices[0].Message.Content {
+	case "Да", "да", "да.":
+		advertisePrompt := "Ты - обычный сосед, который хочет по-соседски посоветовать установку дверей от ООО \"ДВ1\".  Ты должен сообщить, что знаешь владельца, сам пользовался и человеку могут предложить скидку, если он напишет, что он \"от Виктора\". Твоё сообщение должно быть похоже на повседневное человеческое, без лишней дружелюбности. Старайся писать максимально кратко, не более 200 символов. В твоем сообщении должен учитываться контекст сообщения от человека, вычлени из его сообщения жалобу или проблему, если видишь ее, и опиши, как бы продукт компании мог с ней помочь\n\nВот сообщение от человека:\n"
+		resp, err = a.g.SendRequest(advertisePrompt + text)
+		if err != nil {
+			a.Logger.Errorf("%v", err)
+		}
+	case "Нет", "нет", "нет.":
+		// TODO: для дебага
+		b.SendMessage(ctx, &bot.SendMessageParams{
+			ParseMode: models.ParseModeMarkdown,
+			Text:      resp.Choices[0].Message.Content + "\n запрос:\n```скопировать_сообщение " + text + "```",
+			ChatID:    a.cfg.Bot.MainUserId,
+		})
+		return
+	default:
+		a.Logger.Errorf("Некорректный ответ бота на запрос! Запрос: %s\n, Ответ: %s", text, resp.Choices[0].Message.Content)
+		return
+	}
+
 	res := strings.Builder{}
 
-	res.WriteString("Начальный запрос\n\n```" +
+	res.WriteString("Начальный запрос\n\n```Скопировать" +
 		text +
 		"```\n\nСгенерированный ответ\n\n")
 
 	var generatedText string
-	for _, content := range str.Choices {
+	for _, content := range resp.Choices {
 		generatedText += content.Message.Content + " "
 	}
 
-	res.WriteString("```" + generatedText + "```\n\nОтправить ответ?")
+	res.WriteString("```Скоприровать" + generatedText + "```\n\nОтправить ответ?")
 
 	var buttons [][]models.InlineKeyboardButton
 	var agreementButtons []models.InlineKeyboardButton
@@ -194,6 +221,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 
 func (a App) sendWebhookResult(message WebhookMessage) {
 	ctx := context.Background()
+	// TODO: норм обработка
 	if strings.Contains(strings.ToLower(message.Message), "двер") {
 		a.processGigachatAnswer(ctx, a.b, message.Message, *message.SenderTgId)
 	}
