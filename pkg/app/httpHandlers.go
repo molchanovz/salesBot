@@ -91,13 +91,15 @@ func (a App) webhookAmoCRMHandler(c echo.Context) error {
 	a.Logger.Printf("Contact info: %v", lead.Embedded.Contacts[0])
 
 	var tgId int64
-	for i := range lead.Embedded.Contacts[0].CustomFieldsValues {
-		if lead.Embedded.Contacts[0].CustomFieldsValues[i].FieldId == 396043 {
-			value := lead.Embedded.Contacts[0].CustomFieldsValues[i].Values[0].Value
-			tgId, err = strconv.ParseInt(value, 10, 64)
-			if err != nil {
-				panic(err)
-			}
+
+	var contact amoCRM.Contact
+	err = json.Unmarshal(a.crm.GetContact(a.crm.Token, leadId), &contact)
+	if err != nil {
+		return err
+	}
+	for _, values := range contact.CustomFieldsValues {
+		if values.FieldId == 396043 {
+			tgId, _ = strconv.ParseInt(values.Values[0].Value, 10, 64)
 		}
 	}
 

@@ -54,7 +54,7 @@ func NewAmoCRM(config AmoCRMConfig) *AmoCRM {
 /*
 Получение одного контакта в AmoCRM
 */
-func (crm AmoCRM) GetContact(token string, id int) string {
+func (crm AmoCRM) GetContact(token string, id int) []byte {
 
 	url := "https://molchanovtop.amocrm.ru/api/v4/contacts/" + strconv.Itoa(id)
 
@@ -81,12 +81,12 @@ func (crm AmoCRM) GetContact(token string, id int) string {
 	// Если статус не 200 OK, выводим детальную ошибку и тело ответа
 	if resp.StatusCode != http.StatusOK {
 		log.Printf("Ошибка: получен статус %s", resp.Status)
-		return string(responseBody) // Возвращаем тело для отладки
+		return responseBody // Возвращаем тело для отладки
 	}
 
 	fmt.Println(resp.Status)
 
-	return string(responseBody)
+	return responseBody
 }
 
 /*
