@@ -60,7 +60,9 @@ func (a App) webhookHandler(c echo.Context) error {
 		if message.Nickname != nil {
 			a.Logger.Printf("\tNickname: %s\n", *message.Nickname)
 		}
-
+		if message.SenderTgId != nil && *message.SenderTgId == 7246416146 { // TODO: botChatId
+			return nil
+		}
 		a.sendWebhookResult(message)
 	} else {
 		a.Logger.Printf("Ивент вебхука: %s", message.Event)

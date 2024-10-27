@@ -171,7 +171,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 
 	res := strings.Builder{}
 
-	res.WriteString("Начальный запрос\n\n```Скопировать" +
+	res.WriteString("Начальный запрос\n\n```Скопировать " +
 		text +
 		"```\n\nСгенерированный ответ\n\n")
 
@@ -180,7 +180,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 		generatedText += content.Message.Content + " "
 	}
 
-	res.WriteString("```Скоприровать" + generatedText + "```\n\nОтправить ответ?")
+	res.WriteString("```Скопировать " + generatedText + "```\n\nОтправить ответ?")
 
 	var buttons [][]models.InlineKeyboardButton
 	var agreementButtons []models.InlineKeyboardButton
