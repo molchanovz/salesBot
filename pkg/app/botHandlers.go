@@ -23,7 +23,6 @@ func (a *App) registerBotHandlers() {
 	a.b.RegisterHandler(bot.HandlerTypeMessageText, editMessagePattern, bot.MatchTypePrefix, a.editMessageHandler)
 	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternAgreement, bot.MatchTypePrefix, a.handleAgree)
 	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternRefusement, bot.MatchTypePrefix, a.handleRefuse)
-
 }
 
 // Handler с editMessagePattern, редактирование сгенерированного сообщения

@@ -5,6 +5,7 @@ import (
 	"apisrv/pkg/gigaChat"
 	"context"
 	"github.com/go-telegram/bot"
+	"github.com/go-telegram/bot/models"
 	"time"
 
 	"apisrv/pkg/db"
@@ -44,6 +45,7 @@ type App struct {
 }
 
 func New(appName string, verbose bool, cfg Config, dbo db.DB, dbc *pg.DB) *App {
+	var err error
 	a := &App{
 		appName: appName,
 		cfg:     cfg,
@@ -56,8 +58,13 @@ func New(appName string, verbose bool, cfg Config, dbo db.DB, dbc *pg.DB) *App {
 	a.echo.HideBanner = true
 	a.echo.HidePort = true
 	a.echo.IPExtractor = echo.ExtractIPFromRealIPHeader()
-	opts := []bot.Option{}
-	a.b, _ = bot.New(cfg.Bot.Token, opts...)
+	opts := []bot.Option{
+		bot.WithDefaultHandler(a.defaultHandler),
+	}
+	a.b, err = bot.New(cfg.Bot.Token, opts...)
+	if err != nil {
+		a.Logger.Errorf("%v", err)
+	}
 	a.g = gigaChat.NewGigaChat(cfg.GigaChat)
 	a.crm = amoCRM.NewAmoCRM(cfg.AmoCRM)
 	//a.vtsrv = vt.New(a.db, a.Logger, a.cfg.Server.IsDevel)
@@ -89,5 +96,61 @@ func (a *App) Shutdown(timeout time.Duration) {
 
 	if err := a.echo.Shutdown(ctx); err != nil {
 		a.Errorf("shutting down server err=%q", err)
+	}
+}
+
+func (a *App) defaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
+	if update.Message == nil || update.Message.Text == "" {
+		return
+	}
+	req := "Наша компания продаёт двери. \n\nМожно ли человеку предлагать купить дверь если он написал такое сообщение? Мы должны предлагать купить дверь, только если видим в запросе явную нужду в покупке/замене двери. Если из контекста кажется, что дверь можно предложить, но в сообщении явно не написано о желании купить/заменить дверь, то отвечай нет. В сообщении должно быть явно указано, что речь идет об обновлении, замене или покупке чего-то, связанного с дверями. В ответ напиши одно слово, \"да\" либо \"нет\" без точек на конце.\nВот сообщение:\n"
+	resp, err := a.g.SendRequest(req + update.Message.Text)
+	if err != nil {
+		a.Logger.Errorf("%v", err)
+	}
+
+	if len(resp.Choices) < 1 {
+		a.Logger.Errorf("Пустой ответ: %+v", resp.Choices)
+		return
+	}
+
+	switch resp.Choices[0].Message.Content {
+	case "Да", "да":
+		req = "Ты - обычный сосед, который хочет по-дружески посоветовать установку дверей от ООО \"ДВ1\".  Ты должен сообщить, что знаешь владельца, сам пользовался и человеку могут предложить скидку, если он напишет, что он \"от Виктора\". Твоё сообщение должно быть похоже на повседневное человеческое, без лишней дружелюбности. Старайся писать максимально кратко, не более 200 символов. В твоем сообщении должен учитываться контекст сообщения от человека, вычлени из его сообщения жалобу или проблему, если видишь ее, и опиши, как бы продукт компании мог с ней помочь\n\nВот сообщение от человека:\n"
+		resp, err = a.g.SendRequest(req + update.Message.Text)
+		if err != nil {
+			a.Logger.Errorf("%v", err)
+		}
+	case "Нет", "нет":
+		b.SendMessage(ctx, &bot.SendMessageParams{
+			ParseMode: models.ParseModeMarkdown,
+			Text:      resp.Choices[0].Message.Content + "\n запрос:\n```скопировать_сообщение " + update.Message.Text + "```",
+			ChatID:    update.Message.Chat.ID,
+		})
+		return
+	default:
+		a.Logger.Errorf("Некорректный ответ бота на запрос! Запрос: %s\n, Ответ: %s", update.Message.Text, resp.Choices[0].Message.Content)
+		return
+	}
+
+	//res := strings.Builder{}
+	//
+	//res.WriteString("Запрос:\n\n" +
+	//	update.Message.Text)
+	//
+	//var generatedText string
+	//for _, content := range resp.Choices {
+	//	generatedText += content.Message.Content
+	//}
+	//
+	//res.WriteString("\n\nОтвет:\n\n" + generatedText)
+
+	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
+		Text:   resp.Choices[0].Message.Content,
+		ChatID: update.Message.Chat.ID,
+	})
+	if err != nil {
+		a.Logger.Errorf("%v", err)
+		return
 	}
 }
