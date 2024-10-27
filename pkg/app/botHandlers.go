@@ -19,6 +19,21 @@ const (
 	CallBackPatternRefusement = "refuse_"
 )
 
+var forms = `дверь, двери, дверью, дверей, дверьми,
+	фурнитура, фурнитуры, фурнитуре, фурнитуру, фурнитурой, фурнитур, фурнитурах,
+	замки, замков, замкам, замки, замками, замках,
+	ручки, ручек, ручкам, ручки, ручками, ручках,
+	зеркало, зеркала, зеркалу, зеркало, зеркалом, зеркалах,
+	умный замок, умного замка, умному замку, умный замок, умным замком, умных замках,
+	накладка, накладки, накладке, накладку, накладкой, накладок, накладках,
+	откосы, откосов, откосам, откосы, откосами, откосах,
+	входная дверь, входной двери, входной двери, входную дверь, входной дверью, входных дверей, входных дверях,
+	металлическая дверь, металлической двери, металлической двери, металлическую дверь, металлической дверью, металлических дверей, металлических дверях,
+	цилиндр, цилиндра, цилиндру, цилиндр, цилиндром, цилиндрах,
+	личинка, личинки, личинке, личинку, личинкой, личинок, личинках,
+	апгрейд двери, апгрейда двери, апгрейду двери, апгрейд двери, апгрейдом двери, апгрейдов двери, апгрейдах двери,
+	замена двери, замены двери, замене двери, замену двери, заменой двери, замен дверей, заменах двери`
+
 func (a *App) registerBotHandlers() {
 	a.b.RegisterHandler(bot.HandlerTypeMessageText, editMessagePattern, bot.MatchTypePrefix, a.editMessageHandler)
 	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternAgreement, bot.MatchTypePrefix, a.handleAgree)
@@ -221,10 +236,19 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 
 func (a App) sendWebhookResult(message WebhookMessage) {
 	ctx := context.Background()
-	// TODO: норм обработка
-	if strings.Contains(strings.ToLower(message.Message), "двер") {
+	if eligibleForms(strings.ToLower(message.Message)) {
 		a.processGigachatAnswer(ctx, a.b, message.Message, *message.SenderTgId)
 	}
+}
+
+func eligibleForms(in string) bool {
+	fmt.Println(strings.Split(forms, ","))
+	for _, form := range strings.Split(forms, ",") {
+		if strings.Contains(in, form) {
+			return true
+		}
+	}
+	return false
 }
 
 type CallbackDataParams struct {
