@@ -120,10 +120,14 @@ func (a App) webhookAmoCRMHandler(c echo.Context) error {
 	a.Logger.Printf("tgId: %v\n", tgId)
 
 	ctx := context.Background()
-	var message []db.Gigachatmessage
-	message, _ = a.sr.GigachatmessagesByFilters(ctx, &db.GigachatmessageSearch{Tgid: &tgId}, db.PagerOne)
+	var messages []db.Gigachatmessage
+	messages, _ = a.sr.GigachatmessagesByFilters(ctx, &db.GigachatmessageSearch{Tgid: &tgId}, db.PagerOne)
 
-	response, err := a.crm.EditContact(contactId, message[0].Request)
+	if len(messages) < 1 {
+		return echo.ErrNotFound
+	}
+
+	response, err := a.crm.EditContact(contactId, messages[0].Request)
 	if err != nil {
 		return err
 	}
