@@ -64,12 +64,12 @@ func (a App) webhookHandler(c echo.Context) error {
 
 func (a App) webhookAmoCRMHandler(c echo.Context) error {
 	r := c.Request()
-	a.Logger.Printf("webhook gained from amoCrm %+v", c.Request().Form)
+	a.Logger.Printf("webhook gained from amoCrm %+v", c.Request().PostForm)
 	if r.Method != "POST" {
 		return echo.ErrMethodNotAllowed
 	}
 
-	leadId, _ := strconv.Atoi(c.Request().Form.Get("leads[add][0][id]"))
+	leadId, _ := strconv.Atoi(c.Request().PostForm.Get("leads[add][0][id]"))
 
 	a.Logger.Printf("leadId: %v", leadId)
 
