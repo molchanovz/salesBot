@@ -64,12 +64,17 @@ func (a App) webhookHandler(c echo.Context) error {
 
 func (a App) webhookAmoCRMHandler(c echo.Context) error {
 	r := c.Request()
-	a.Logger.Printf("webhook gained from amoCrm %+v", c.Request().PostForm)
+	params, err := c.FormParams()
+	if err != nil {
+		a.Logger.Errorf("%+v", err)
+		return err
+	}
+	a.Logger.Printf("webhook gained from amoCrm %+v", params)
 	if r.Method != "POST" {
 		return echo.ErrMethodNotAllowed
 	}
 
-	leadId, _ := strconv.Atoi(c.Request().PostForm.Get("leads[add][0][id]"))
+	leadId, _ := strconv.Atoi(params.Get("leads[add][0][id]"))
 
 	a.Logger.Printf("leadId: %v", leadId)
 
@@ -84,7 +89,6 @@ func (a App) webhookAmoCRMHandler(c echo.Context) error {
 	a.Logger.Printf("contactId: %v", contactId)
 
 	var tgId int64
-	var err error
 	for i := range lead.Embedded.Contacts[0].CustomFieldsValues {
 		if lead.Embedded.Contacts[0].CustomFieldsValues[i].FieldId == 396043 {
 			value := lead.Embedded.Contacts[0].CustomFieldsValues[i].Values[0].Value
