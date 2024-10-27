@@ -5,10 +5,16 @@ import (
 	"apisrv/pkg/db"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"strconv"
+)
+
+const (
+	fieldTgId = 396043
+	leadIdKey = "leads[add][0][id]"
 )
 
 // WebhookMessage структура для хранения данных вебхука
@@ -74,43 +80,56 @@ func (a App) webhookAmoCRMHandler(c echo.Context) error {
 		return echo.ErrMethodNotAllowed
 	}
 
-	leadId, _ := strconv.Atoi(params.Get("leads[add][0][id]"))
-
+	var leadId int
+	leadId, _ = strconv.Atoi(params.Get(leadIdKey))
+	if leadId == 0 {
+		return errors.New("ERROR: leadId is 0")
+	}
 	a.Logger.Printf("leadId: %v\n", leadId)
 
 	leadString := a.crm.GetLead(a.crm.Token, leadId)
-
 	var lead amoCRM.Lead
+	err = json.Unmarshal(leadString, &lead)
+	if err != nil {
+		return err
+	}
 
-	json.Unmarshal(leadString, &lead)
-
-	contactId := lead.Embedded.Contacts[0].Id
-
+	var contactId int
+	contactId = lead.Embedded.Contacts[0].Id
+	if contactId == 0 {
+		return errors.New("ERROR: contactId is 0")
+	}
 	a.Logger.Printf("contactId: %v\n", contactId)
 
 	var tgId int64
-
 	var contact amoCRM.Contact
 	err = json.Unmarshal(a.crm.GetContact(a.crm.Token, contactId), &contact)
 	if err != nil {
 		return err
 	}
+	//поиск поля с tgId (смотрим в сделке)
 	for _, values := range contact.CustomFieldsValues {
-		if values.FieldId == 396043 {
+		if values.FieldId == fieldTgId {
 			tgId, _ = strconv.ParseInt(values.Values[0].Value, 10, 64)
 		}
 	}
 
-	a.Logger.Printf("Наш тг айди: %v", tgId)
+	if tgId == 0 {
+		return errors.New("ERROR: tgId is 0")
+	}
+	a.Logger.Printf("tgId: %v\n", tgId)
 
 	ctx := context.Background()
 	var message []db.Gigachatmessage
 	message, _ = a.sr.GigachatmessagesByFilters(ctx, &db.GigachatmessageSearch{Tgid: &tgId}, db.PagerOne)
 
-	a.crm.EditContact(contactId, message[0].Request)
+	response, err := a.crm.EditContact(contactId, message[0].Request)
+	if err != nil {
+		return err
+	}
 
+	a.Logger.Printf("Editing contact: %v\n", response)
 	return nil
-
 }
 
 func (a *App) registerHandlers() {

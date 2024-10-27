@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -182,12 +183,12 @@ func (crm AmoCRM) AddContact(nickName, number, request string) string {
 	return fmt.Sprintf("Статус запроса: %+v ", resp.Status)
 }
 
-func (crm AmoCRM) EditContact(contactId int, request string) string {
+func (crm AmoCRM) EditContact(contactId int, request string) (string, error) {
 
 	telegramRequestValue := Value{Value: request}
 	telegramRequestValues := Values{telegramRequestValue}
 
-	telegramRequestField := CustomFieldsValue{Values: telegramRequestValues, FieldName: "Запрос", FieldId: 338825}
+	telegramRequestField := CustomFieldsValue{Values: telegramRequestValues, FieldName: "Текст запроса", FieldId: 488793}
 
 	customFieldsValues := CustomFieldsValues{telegramRequestField}
 	contacts := Contacts{Contact{Id: contactId, CustomFieldsValues: customFieldsValues}}
@@ -196,13 +197,13 @@ func (crm AmoCRM) EditContact(contactId int, request string) string {
 
 	body, err := json.Marshal(contacts)
 	if err != nil {
-		log.Fatalf("Ошибка чтения структуры Сделка: %v", err)
+		return "", errors.New(fmt.Sprintf("Ошибка чтения структуры Сделка: %v", err))
 	}
 
 	req, err := http.NewRequest("PATCH", url, bytes.NewBuffer(body))
 
 	if err != nil {
-		log.Fatalf("Ошибка создания запроса: %v", err)
+		return "", errors.New(fmt.Sprintf("Ошибка создания запроса: %v", err))
 	}
 
 	req.Header.Set("Authorization", "Bearer "+crm.Token)
@@ -210,19 +211,17 @@ func (crm AmoCRM) EditContact(contactId int, request string) string {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatalf("Ошибка выполнения запроса: %v", err)
+		return "", errors.New(fmt.Sprintf("Ошибка выполнения запроса: %v", err))
 	}
 	defer resp.Body.Close()
 
 	responseBody, _ := io.ReadAll(resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
-		log.Printf("Ошибка: получен статус %s", resp.Status)
-		log.Printf("Тело ответа: %s", string(responseBody))
-		return string(responseBody)
+		return string(responseBody), errors.New(fmt.Sprintf("Ошибка: получен статус %s", resp.Status))
 	}
 
-	return fmt.Sprintf("Статус запроса: %+v ", resp.Status)
+	return fmt.Sprintf("Статус запроса: %+v ", resp.Status), nil
 }
 
 /*
