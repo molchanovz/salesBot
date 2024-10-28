@@ -94,7 +94,7 @@ func (a *App) handleAgree(ctx context.Context, b *bot.Bot, update *models.Update
 		return
 	}
 
-	fmt.Printf("Инфо: %+v", info)
+	fmt.Printf("Инфо: %+v", *info.Response)
 }
 
 // Handler нажатия кнопки, отказ от отправки сгенерированного сообщения
