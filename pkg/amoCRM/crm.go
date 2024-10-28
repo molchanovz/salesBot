@@ -12,33 +12,9 @@ import (
 	"strconv"
 )
 
-func main() {
-	//telephoneNumValue := Value{Value: "88005553535", EnumId: 273245, EnumCode: "WORK"}
-	//telephoneNumValues := Values{telephoneNumValue}
-	//
-	//telegramNicknameValue := Value{Value: "@molchanovz"}
-	//telegramNicknameValues := Values{telegramNicknameValue}
-	//
-	//telegramRequestValue := Value{Value: "У меня сломалась дверь, знает кто-нибудь хороших специалистов?"}
-	//telegramRequestValues := Values{telegramRequestValue}
-	//
-	//telephoneNumField := CustomFieldsValue{Values: telephoneNumValues, FieldName: "Телефон", FieldId: 312455, FieldCode: "PHONE"}
-	//telegramNicknameField := CustomFieldsValue{Values: telegramNicknameValues, FieldName: "Ник телеграм", FieldId: 337421}
-	//telegramRequestField := CustomFieldsValue{Values: telegramRequestValues, FieldName: "Запрос", FieldId: 338825}
-	//
-	//customFieldsValues := CustomFieldsValues{telephoneNumField, telegramNicknameField, telegramRequestField}
-	//contacts := Contacts{Contact{FirstName: "Сергей", LastName: "Молчанов", CustomFieldsValues: customFieldsValues}}
-	//fmt.Println(addContact(token, contacts))
-
-	//fmt.Println(getContact(token))
-
-	//fmt.Println(getLead(token))
-	//contacts := Contacts{Contact{Id: 1185541}}
-	//lead := Lead{Name: "Тест", Embedded: Embedded{Contacts: contacts}}
-	//leads := Leads{lead}
-	//fmt.Println(addLead(token, leads))
-	//fmt.Println(getLead(token, 2850715))
-}
+const (
+	fieldReqText = 1433145
+)
 
 type AmoCRMConfig struct {
 	Token string
@@ -188,7 +164,7 @@ func (crm AmoCRM) EditContact(contactId int, request string) (string, error) {
 	telegramRequestValue := Value{Value: request}
 	telegramRequestValues := Values{telegramRequestValue}
 
-	telegramRequestField := CustomFieldsValue{Values: telegramRequestValues, FieldName: "Текст запроса", FieldId: 488793}
+	telegramRequestField := CustomFieldsValue{Values: telegramRequestValues, FieldName: "Текст запроса", FieldId: fieldReqText}
 
 	customFieldsValues := CustomFieldsValues{telegramRequestField}
 	contacts := Contacts{Contact{Id: contactId, CustomFieldsValues: customFieldsValues}}
