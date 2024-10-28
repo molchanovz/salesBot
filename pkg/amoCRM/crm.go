@@ -33,7 +33,7 @@ func NewAmoCRM(config AmoCRMConfig) *AmoCRM {
 */
 func (crm AmoCRM) GetContact(token string, id int) []byte {
 
-	url := "https://molchanovtop.amocrm.ru/api/v4/contacts/" + strconv.Itoa(id)
+	url := "https://sindoor.amocrm.ru/api/v4/contacts/" + strconv.Itoa(id)
 
 	body := []byte(`with:{}`)
 
@@ -71,7 +71,7 @@ func (crm AmoCRM) GetContact(token string, id int) []byte {
 */
 func (crm AmoCRM) GetLead(token string, id int) []byte {
 
-	url := "https://molchanovtop.amocrm.ru/api/v4/leads/" + strconv.Itoa(id) + "?with=contacts"
+	url := "https://sindoor.amocrm.ru/api/v4/leads/" + strconv.Itoa(id) + "?with=contacts"
 
 	body := []byte(``)
 
@@ -126,7 +126,7 @@ func (crm AmoCRM) AddContact(nickName, number, request string) string {
 	customFieldsValues := CustomFieldsValues{telephoneNumField, telegramNicknameField, telegramRequestField}
 	contacts := Contacts{Contact{FirstName: "Сергей", LastName: "Молчанов", CustomFieldsValues: customFieldsValues}}
 
-	url := "https://molchanovtop.amocrm.ru/api/v4/contacts"
+	url := "https://sindoor.amocrm.ru/api/v4/contacts"
 
 	body, err := json.Marshal(contacts)
 	if err != nil {
@@ -169,7 +169,7 @@ func (crm AmoCRM) EditContact(contactId int, request string) (string, error) {
 	customFieldsValues := CustomFieldsValues{telegramRequestField}
 	contacts := Contacts{Contact{Id: contactId, CustomFieldsValues: customFieldsValues}}
 
-	url := "https://molchanovtop.amocrm.ru/api/v4/contacts"
+	url := "https://sindoor.amocrm.ru/api/v4/contacts"
 
 	body, err := json.Marshal(contacts)
 	if err != nil {
@@ -204,7 +204,7 @@ func (crm AmoCRM) EditContact(contactId int, request string) (string, error) {
 Добавление одной сделки в AmoCRM
 */
 func (crm AmoCRM) AddLead(token string, leads Leads) string {
-	url := "https://molchanovtop.amocrm.ru/api/v4/leads"
+	url := "https://sindoor.amocrm.ru/api/v4/leads"
 
 	body, err := json.Marshal(leads)
 	if err != nil {
@@ -242,7 +242,7 @@ func (crm AmoCRM) AddLead(token string, leads Leads) string {
 */
 func (crm AmoCRM) GetParams(token string) string {
 
-	url := "https://molchanovtop.amocrm.ru/api/v4/account"
+	url := "https://sindoor.amocrm.ru/api/v4/account"
 	body := []byte(`{}`)
 
 	req, err := http.NewRequest("GET", url, bytes.NewBuffer(body))
