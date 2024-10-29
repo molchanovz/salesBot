@@ -23,8 +23,11 @@ type Msg struct {
 }
 
 type GigaChatConfig struct {
-	AuthKey  string
-	ClientId string
+	AuthKey      string
+	ClientId     string
+	Keywords     string
+	FirstFactor  string
+	SecondFactor string
 }
 
 type GigaChat struct {
@@ -45,7 +48,7 @@ func (g GigaChat) SendRequest(content string) (Response, error) {
 	payload := CompletionData{
 		Model: "GigaChat",
 		Messages: []*Msg{
-			&Msg{
+			{
 				Role:    "user",
 				Content: content,
 			},

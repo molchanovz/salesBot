@@ -19,8 +19,6 @@ const (
 	CallBackPatternRefusement = "refuse_"
 )
 
-var forms = `дверь,двери,дверью,дверей,дверьми,фурнитура,фурнитуры,фурнитуре,фурнитуру,фурнитурой,фурнитур,фурнитурах,замки,замков,замкам,замки,замками,замках,ручки,ручек,ручкам,ручки,ручками,ручках,зеркало,зеркала,зеркалу,зеркало,зеркалом,зеркалах,умный замок,умного замка,умному замку,умный замок,умным замком,умных замках,накладка,накладки,накладке,накладку,накладкой,накладок,накладках,откосы,откосов,откосам,откосы,откосами,откосах,входная дверь,входной двери,входной двери,входную дверь,входной дверью,входных дверей,входных дверях,металлическая дверь,металлической двери,металлической двери,металлическую дверь,металлической дверью,металлических дверей,металлических дверях,цилиндр,цилиндра,цилиндру,цилиндр,цилиндром,цилиндрах,личинка,личинки,личинке,личинку,личинкой,личинок,личинках,апгрейд двери,апгрейда двери,апгрейду двери,апгрейд двери,апгрейдом двери,апгрейдов двери,апгрейдах двери,замена двери,замены двери,замене двери,замену двери,заменой двери,замен дверей,заменах двери`
-
 func (a *App) registerBotHandlers() {
 	a.b.RegisterHandler(bot.HandlerTypeMessageText, editMessagePattern, bot.MatchTypePrefix, a.editMessageHandler)
 	a.b.RegisterHandler(bot.HandlerTypeCallbackQueryData, CallBackPatternAgreement, bot.MatchTypePrefix, a.handleAgree)
@@ -139,7 +137,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 		return
 	}
 
-	yesNoPrompt := "Наша компания продаёт двери. \n\nМожно ли человеку предлагать купить дверь если он написал такое сообщение? Мы должны предлагать купить дверь, только если видим в запросе явную нужду в покупке/замене двери. Если из контекста кажется, что дверь можно предложить, но в сообщении явно не написано о желании купить/заменить дверь, то отвечай нет. В сообщении должно быть явно указано, что речь идет об обновлении, замене или покупке чего-то, связанного с дверями. В ответ напиши одно слово, \"да\" либо \"нет\" без точек на конце.\nВот сообщение:\n"
+	yesNoPrompt := a.cfg.GigaChat.FirstFactor + "\nВот сообщение:\n"
 
 	resp, err := a.g.SendRequest(yesNoPrompt + text)
 	if err != nil {
@@ -153,7 +151,7 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 
 	switch resp.Choices[0].Message.Content {
 	case "Да", "да", "да.":
-		advertisePrompt := "Ты - обычный сосед, который хочет по-соседски посоветовать установку дверей от \"Синдорсервис\".  Ты должен сообщить, что знаешь владельца, сам пользовался и человеку могут предложить скидку, если он напишет, что он \"от Виктора\". Твоё сообщение должно быть похоже на повседневное человеческое, без лишней дружелюбности. Старайся писать максимально кратко, не более 200 символов. В твоем сообщении должен учитываться контекст сообщения от человека, вычлени из его сообщения жалобу или проблему, если видишь ее, и опиши, как бы продукт компании мог с ней помочь\n\nВот сообщение от человека:\n"
+		advertisePrompt := a.cfg.GigaChat.SecondFactor + "\nВот сообщение от человека:\n"
 		resp, err = a.g.SendRequest(advertisePrompt + text)
 		if err != nil {
 			a.Logger.Errorf("%v", err)
@@ -223,13 +221,13 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 
 func (a App) sendWebhookResult(message WebhookMessage) {
 	ctx := context.Background()
-	if eligibleForms(strings.ToLower(message.Message)) {
+	if a.eligibleForms(strings.ToLower(message.Message)) {
 		a.processGigachatAnswer(ctx, a.b, message.Message, *message.SenderTgId)
 	}
 }
 
-func eligibleForms(in string) bool {
-	for _, form := range strings.Split(forms, ",") {
+func (a App) eligibleForms(in string) bool {
+	for _, form := range strings.Split(a.cfg.GigaChat.Keywords, ",") {
 		if strings.Contains(in, form) {
 			return true
 		}

@@ -17,6 +17,9 @@ ApplicationName = "salesBot"
 [GigaChat]
 AuthKey  = ""
 ClientId = ""
+Keywords = ""
+FirstFactor = ""
+SecondFactor = ""
 
 [AmoCRM]
 Token = ""
