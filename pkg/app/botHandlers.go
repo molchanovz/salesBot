@@ -157,12 +157,12 @@ func (a *App) processGigachatAnswer(ctx context.Context, b *bot.Bot, text string
 			a.Logger.Errorf("%v", err)
 		}
 	case "Нет", "нет", "нет.":
-		// TODO: для дебага
-		b.SendMessage(ctx, &bot.SendMessageParams{
-			ParseMode: models.ParseModeMarkdown,
-			Text:      resp.Choices[0].Message.Content + "\n запрос:\n```скопировать_сообщение " + text + "```",
-			ChatID:    a.cfg.Bot.MainUserId,
-		})
+		// TODO: убрано из-за большого кол-ва спама
+		//b.SendMessage(ctx, &bot.SendMessageParams{
+		//	ParseMode: models.ParseModeMarkdown,
+		//	Text:      resp.Choices[0].Message.Content + "\n запрос:\n```скопировать_сообщение " + text + "```",
+		//	ChatID:    a.cfg.Bot.MainUserId,
+		//})
 		return
 	default:
 		a.Logger.Errorf("Некорректный ответ бота на запрос! Запрос: %s\n, Ответ: %s", text, resp.Choices[0].Message.Content)
